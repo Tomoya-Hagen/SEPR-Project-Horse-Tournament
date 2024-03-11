@@ -7,8 +7,8 @@ Vergessen Sie nicht im Projekt ihren Namen und Matrikelnummer zu ersetzen.
 
 ## Stundenliste
 
-**Name**: Max Musterperson\
-**Matrikelnummer**: 01234567
+**Name**: Tomoya Vinzenz Kys Hagen
+**Matrikelnummer**: 12026650
 
 
 | Datum | Startzeit | Dauer | Story-ID | Tätigkeit |
