@@ -7,7 +7,7 @@ Vergessen Sie nicht im Projekt ihren Namen und Matrikelnummer zu ersetzen.
 
 ## Stundenliste
 
-**Name**: Tomoya Hagen\
+**Name**: Tomoya Vinzenz Kys Hagen\
 **Matrikelnummer**: 12026650
 
 
