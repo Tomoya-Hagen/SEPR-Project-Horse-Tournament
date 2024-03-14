@@ -15,5 +15,6 @@ Vergessen Sie nicht im Projekt ihren Namen und Matrikelnummer zu ersetzen.
 |11.03. | 17:00     | 4h    |  none    | set-up    |
 |12.03. | 22:00     | 1h    |    1     | fronted   |
 |13.03. | 14:00     | 6h    |   1/none | backend, set-up  |
+|14.03. | 15:30     | 4h    |  1       | backend, test|
 
-**Gesamtsumme der Zeit**: 11h
+**Gesamtsumme der Zeit**: 15h
