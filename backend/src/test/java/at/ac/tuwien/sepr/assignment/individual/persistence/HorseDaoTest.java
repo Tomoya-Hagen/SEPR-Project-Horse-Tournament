@@ -1,9 +1,12 @@
 package at.ac.tuwien.sepr.assignment.individual.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import at.ac.tuwien.sepr.assignment.individual.TestBase;
+import at.ac.tuwien.sepr.assignment.individual.dto.BreedDto;
+import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepr.assignment.individual.type.Sex;
@@ -100,4 +103,26 @@ public class HorseDaoTest extends TestBase {
                 .setWeight(670)
                 .setBreedId(-19L));
   }
+
+  @Test
+  public void createHorseSuccessfully() {
+    HorseDetailDto horse = new HorseDetailDto(
+        1L,
+        "Test Horse Create",
+        Sex.MALE,
+        LocalDate.of(2010, 2, 20),
+        2,
+        320,
+        new BreedDto(-19L, "Welsh Cob")
+        );
+    var createdHorse = horseDao.create(horse);
+    assertNotNull(createdHorse);
+    assertEquals(createdHorse.getName(), horse.name());
+    assertEquals(createdHorse.getSex(), horse.sex());
+    assertEquals(createdHorse.getDateOfBirth(), horse.dateOfBirth());
+    assertEquals(createdHorse.getHeight(), horse.height());
+    assertEquals(createdHorse.getWeight(), horse.weight());
+    assertEquals(createdHorse.getBreedId(), horse.breed().id());
+  }
+
 }
