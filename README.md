@@ -12,10 +12,11 @@ Vergessen Sie nicht im Projekt ihren Namen und Matrikelnummer zu ersetzen.
 
 
 | Datum | Startzeit | Dauer | Story-ID | Tätigkeit |
-|11.03. | 17:00     | 4h    |   none   | set-up    |
-|12.03. | 22:00     | 1h    |    1     | FE        |
-|13.03. | 14:00     | 6h    |   1/none | BE, set-up|
-|14.03. | 15:30     | 4h    |    1     | BE, test  |
-|17.03. | 15:00     | 6h    |   1, 2   | FE, BE    |
+|-------|-----------|-------|----------|-----------|
+| 11.03. | 17:00 | 4h | none | set-up |
+| 12.03. | 22:00 | 1h | 1 | FE |
+| 13.03. | 14:00 | 6h | 1/none | BE, set-up|
+| 14.03. | 15:30 | 4h | 1 | BE, test |
+| 17.03. | 15:00 | 6h | 1, 2 | FE, BE |
 
 **Gesamtsumme der Zeit**: 21h
