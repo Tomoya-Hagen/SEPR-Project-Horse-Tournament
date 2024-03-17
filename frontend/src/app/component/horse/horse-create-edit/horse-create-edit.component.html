@@ -47,7 +47,7 @@
                  placeholder="yyyy-mm-dd"
                  class="form-control"
                  [class]="dynamicCssClassesForInput(horseDateOfBirthModel)"
-                 [(ngModel)]="dateOfBirth"
+                 [(ngModel)]="horse.dateOfBirth"
                  #horseDateOfBirthModel="ngModel"
                  required
                  >
@@ -122,7 +122,7 @@
                  id="horseHeight"
                  name="horseHeight"
                  step="0.01"
-                 [(ngModel)]="height"
+                 [(ngModel)]="horse.height"
                  required
                  >
         </div>
@@ -143,7 +143,7 @@
                  id="horseWeight"
                  name="horseWeight"
                  step="1"
-                 [(ngModel)]="weight"
+                 [(ngModel)]="horse.weight"
                  required
                  >
         </div>
@@ -155,11 +155,12 @@
       </div>
     </div>
   </div>
+  <!-- End height and weight row -->
 
   <div class="mt-4 d-flex flex-row">
     <button type="button"
             class="btn btn-danger"
-            *ngIf="!modeIsCreate"
+            *ngIf="modeIsEdit"
             >
       <i class="bi bi-trash"></i>
       Delete

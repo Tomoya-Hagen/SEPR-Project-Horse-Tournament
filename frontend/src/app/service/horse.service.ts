@@ -1,6 +1,6 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {map, Observable, tap} from 'rxjs';
+import {map, mergeMap, Observable, tap, throwError} from 'rxjs';
 import {environment} from 'src/environments/environment';
 import {Horse, HorseListDto} from '../dto/horse';
 import {HorseSearch} from '../dto/horse';
@@ -63,4 +63,18 @@ export class HorseService {
     );
   }
 
+  update(horse: Horse): Observable<Horse> {
+    if (horse.id) {
+      return this.getById(horse.id).pipe(
+        mergeMap(() => { //using mergeMap enables us to chain the asychnronous operations in a sequence
+          return this.http.put<Horse>(
+            `${baseUri}/${horse.id}`,
+            horse
+          );
+        })
+      );
+    } else {
+      return throwError(() => ({message: "Horse has no id"}));
+    }
+  }
 }

@@ -5,9 +5,9 @@ export interface Horse {
   id?: number;
   name: string;
   sex: Sex;
-  dateOfBirth: Date;
-  height: number;
-  weight: number;
+  dateOfBirth: Date | null;
+  height: number | null;
+  weight: number | null;
   breed?: Breed;
 }
 

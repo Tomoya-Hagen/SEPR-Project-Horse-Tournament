@@ -26,14 +26,15 @@ export class HorseCreateEditComponent implements OnInit {
   horse: Horse = {
     name: '',
     sex: Sex.female,
-    dateOfBirth: new Date(), // TODO this is bad
-    height: 0, // TODO this is bad
-    weight: 0, // TODO this is bad
+    dateOfBirth: null,
+    height: null,
+    weight: null,
   };
 
   private heightSet: boolean = false;
   private weightSet: boolean = false;
   private dateOfBirthSet: boolean = false;
+
 
   get height(): number | null {
     return this.heightSet
@@ -42,6 +43,9 @@ export class HorseCreateEditComponent implements OnInit {
   }
 
   set height(value: number) {
+    if (value <= 0 || value >= 100) {
+      return;
+    }
     this.heightSet = true;
     this.horse.height = value;
   }
@@ -53,6 +57,9 @@ export class HorseCreateEditComponent implements OnInit {
   }
 
   set weight(value: number) {
+    if (value <= 0 || value >= 100000) {
+      return;
+    }
     this.weightSet = true;
     this.horse.weight = value;
   }
@@ -82,6 +89,8 @@ export class HorseCreateEditComponent implements OnInit {
     switch (this.mode) {
       case HorseCreateEditMode.create:
         return 'Create New Horse';
+      case HorseCreateEditMode.edit:
+        return 'Edit Horse';
       default:
         return '?';
     }
@@ -91,6 +100,8 @@ export class HorseCreateEditComponent implements OnInit {
     switch (this.mode) {
       case HorseCreateEditMode.create:
         return 'Create';
+      case HorseCreateEditMode.edit:
+        return 'Update';
       default:
         return '?';
     }
@@ -100,6 +111,9 @@ export class HorseCreateEditComponent implements OnInit {
     return this.mode === HorseCreateEditMode.create;
   }
 
+  get modeIsEdit(): boolean {
+    return this.mode === HorseCreateEditMode.edit;
+  }
 
   get sex(): string {
     switch (this.horse.sex) {
@@ -113,15 +127,26 @@ export class HorseCreateEditComponent implements OnInit {
     switch (this.mode) {
       case HorseCreateEditMode.create:
         return 'created';
+      case HorseCreateEditMode.edit:
+        return 'updated';
       default:
         return '?';
     }
   }
 
   ngOnInit(): void {
-    this.route.data.subscribe(data => {
-      this.mode = data.mode;
-    });
+    const id = this.route.snapshot.params['id'];
+    if (id) {
+      this.service.getById(id).subscribe(horse => {
+        this.horse = horse;
+        this.mode = HorseCreateEditMode.edit;
+      });
+    } else {
+      // this.route.data.subscribe(data => {
+      //   this.mode = data.mode;
+      // });
+      this.mode = HorseCreateEditMode.create;
+    }
   }
 
   public dynamicCssClassesForInput(input: NgModel): any {
@@ -146,6 +171,9 @@ export class HorseCreateEditComponent implements OnInit {
         case HorseCreateEditMode.create:
           observable = this.service.create(this.horse);
           break;
+        case HorseCreateEditMode.edit:
+          observable = this.service.update(this.horse);
+          break;
         default:
           console.error('Unknown HorseCreateEditMode', this.mode);
           return;
@@ -156,8 +184,15 @@ export class HorseCreateEditComponent implements OnInit {
           this.router.navigate(['/horses']);
         },
         error: error => {
-          console.error('Error creating horse', error);
+          if(this.mode === HorseCreateEditMode.create) {
+            console.error('Error creating horse', error);
+            this.notification.error('Could not create horse: ' + error.message);
           // TODO show an error message to the user. Include and sensibly present the info from the backend!
+          }
+          if(this.mode === HorseCreateEditMode.edit) {
+            console.error('Error updating horse', error);
+            this.notification.error('Could not update horse: ' + error.message);
+          }
         }
       });
     }
