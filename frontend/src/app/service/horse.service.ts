@@ -63,6 +63,13 @@ export class HorseService {
     );
   }
 
+  /**
+   * Update an existing horse in the system.
+   *
+   * @param horse the data for the horse that should be updated
+   * @return an Observable for the updated horse
+   * @throws an error if the horse has no id
+   */
   update(horse: Horse): Observable<Horse> {
     if (horse.id) {
       return this.getById(horse.id).pipe(
