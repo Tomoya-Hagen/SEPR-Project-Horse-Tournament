@@ -88,4 +88,13 @@ public class HorseServiceImpl implements HorseService {
     var breeds = breedMapForSingleHorse(createdHorse);
     return mapper.entityToDetailDto(createdHorse, breeds);
   }
+
+  @Override
+  public void delete(long id) throws NotFoundException {
+    LOG.trace("delete({})", id);
+    if (id == 0) { //TODO: check which IDs are invalid
+      throw new NotFoundException("No Horse with id " + id + " exists");
+    }
+    dao.delete(id);
+  }
 }

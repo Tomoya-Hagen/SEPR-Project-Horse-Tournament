@@ -38,7 +38,8 @@ public class HorseJdbcDao implements HorseDao {
 
   private static final String SQL_LIMIT_CLAUSE = " LIMIT :limit";
 
-  private static final String SQL_UPDATE = "UPDATE " + TABLE_NAME
+  private static final String SQL_UPDATE = "UPDATE "
+      + TABLE_NAME
       + " SET name = ?"
       + "  , sex = ?"
       + "  , date_of_birth = ?"
@@ -50,6 +51,10 @@ public class HorseJdbcDao implements HorseDao {
   private static final String SQL_CREATE = "INSERT INTO "
       + TABLE_NAME + "(name, sex, date_of_birth, height, weight, breed_id) "
       + "VALUES (?, ?, ?, ?, ?, ?)";
+
+  private static final String SQL_DELETE = "DELETE FROM "
+      + TABLE_NAME
+      + " WHERE id = ?";
 
   private final JdbcTemplate jdbcTemplate;
   private final NamedParameterJdbcTemplate jdbcNamed;
@@ -170,4 +175,15 @@ public class HorseJdbcDao implements HorseDao {
 
     return newHorse;
   }
+
+  @Override
+  public void delete(long id) throws NotFoundException {
+    LOG.trace("delete({})", id);
+    int deleted = jdbcTemplate.update(SQL_DELETE, id);
+
+    if (deleted == 0) {
+      throw new NotFoundException("Could not delete horse with ID " + id + ", because it does not exist");
+    }
+  }
+
 }

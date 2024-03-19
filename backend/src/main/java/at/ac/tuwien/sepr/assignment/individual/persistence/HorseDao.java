@@ -49,5 +49,13 @@ public interface HorseDao {
    * @param horse the horse to create
    * @return the created horse
    */
-  public Horse create(HorseDetailDto horse);
+  Horse create(HorseDetailDto horse);
+
+  /**
+   * Delete the horse with the given ID.
+   *
+   * @param id the ID of the horse to delete
+   * @throws NotFoundException if the horse with the given ID does not exist
+   */
+  void delete(long id) throws NotFoundException;
 }

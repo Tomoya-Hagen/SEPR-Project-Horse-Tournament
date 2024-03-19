@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -77,5 +78,19 @@ public class HorseEndpoint {
     LOG.info("POST " + BASE_PATH);
     LOG.debug("Body of request:\n{}", toCreate);
     return ResponseEntity.status(HttpStatus.CREATED).body(service.create(toCreate));
+  }
+
+  @DeleteMapping("{id}")
+  public ResponseEntity<Void> delete(@PathVariable("id") long id) throws NotFoundException {
+    LOG.info("DELETE " + BASE_PATH + "/{}", id);
+    LOG.debug("request parameters: {}", id);
+    try {
+      service.delete(id);
+      return ResponseEntity.noContent().build();
+    } catch (NotFoundException e) {
+      HttpStatus status = HttpStatus.NOT_FOUND;
+      logClientError(status, "Horse to delete not found", e);
+      throw new ResponseStatusException(status, e.getMessage(), e);
+    }
   }
 }
