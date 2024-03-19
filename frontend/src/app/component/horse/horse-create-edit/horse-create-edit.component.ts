@@ -82,8 +82,7 @@ export class HorseCreateEditComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private notification: ToastrService,
-  ) {
-  }
+  ) { }
 
   public get heading(): string {
     switch (this.mode) {
@@ -196,6 +195,25 @@ export class HorseCreateEditComponent implements OnInit {
         }
       });
     }
+  }
+
+  deleteHorse(horse: Horse): void {
+    if (!horse) {
+      throw Error("HorseForDeletion is null or undefined");
+    }
+    if (!horse.id) { //TODO: add condition for invalid id
+      throw Error("HorseForDeletion has no id");
+    }
+    this.service.delete(horse.id).subscribe({
+      next: () => {
+        this.notification.success(`Horse ${horse.name} deleted`, 'Horse Deleted');
+        this.router.navigate(['/horses']);
+      },
+      error: error => {
+        console.error('Error deleting horse', error);
+        this.notification.error('Could not delete horse: ' + error.message, 'Error');
+      }
+    })
   }
 
 }

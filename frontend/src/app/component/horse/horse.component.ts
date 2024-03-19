@@ -71,4 +71,24 @@ export class HorseComponent implements OnInit {
 
   formatBreedName = (name: string) => name; // It is already the breed name, we just have to give a function to the component
 
+  deleteHorse(horse: Horse): void {
+    this.horseForDeletion = horse;
+    if (!this.horseForDeletion) {
+      throw Error("HorseForDeletion is null or undefined");
+    }
+    if (!this.horseForDeletion.id) { //TODO: add condition for invalid id
+      throw Error("HorseForDeletion has no id");
+    }
+    this.service.delete(this.horseForDeletion.id).subscribe({
+      next: () => {
+        this.horses = this.horses.filter(h => h.id !== this.horseForDeletion?.id);
+        this.notification.success(`Horse ${this.horseForDeletion?.name} deleted`, 'Horse Deleted');
+        this.horseForDeletion = undefined;
+      },
+      error: error => {
+        console.error('Error deleting horse', error);
+        this.notification.error('Could not delete horse: ' + error.message, 'Error');
+      }
+    })
+  }
 }

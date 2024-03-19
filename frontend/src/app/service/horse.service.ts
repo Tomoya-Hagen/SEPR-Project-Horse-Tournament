@@ -6,6 +6,7 @@ import {Horse, HorseListDto} from '../dto/horse';
 import {HorseSearch} from '../dto/horse';
 import {formatIsoDate} from '../util/date-helper';
 
+
 const baseUri = environment.backendUrl + '/horses';
 
 @Injectable({
@@ -83,5 +84,18 @@ export class HorseService {
     } else {
       return throwError(() => ({message: "Horse has no id"}));
     }
+  }
+
+  /**
+   *
+   * @param id the id of the horse that should be deleted
+   * @returns an Observable for the deleted horse
+   * @throws an error if the horse has no id
+   */
+  delete(id: number): Observable<void> {
+    if (!id) {
+      return throwError(() => ({message: "Horse has no id"}));
+    }
+    return this.http.delete<void>(`${baseUri}/${id}`);
   }
 }

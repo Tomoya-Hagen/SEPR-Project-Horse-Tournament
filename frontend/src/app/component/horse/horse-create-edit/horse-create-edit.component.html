@@ -161,6 +161,8 @@
     <button type="button"
             class="btn btn-danger"
             *ngIf="modeIsEdit"
+            (click)="deleteHorse(horse)"
+            aria-label="Delete horse"
             >
       <i class="bi bi-trash"></i>
       Delete
