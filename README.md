@@ -20,6 +20,7 @@ Vergessen Sie nicht im Projekt ihren Namen und Matrikelnummer zu ersetzen.
 | 17.03. | 15:00 | 6h | 1, 2 | FE, BE |
 | 18.03. | 17:15 | 0.25h | 2, 10 | adding javaDoc |
 | 19.03. | 07:00 | 5,5h | 3 | BE, FE |
+| 22.03. | 07:00 | 7h | 4, 15, 5 | BE, FE, formatting, started US5 |
 
 
-**Gesamtsumme der Zeit**: 26.75h
+**Gesamtsumme der Zeit**: 33.75h
