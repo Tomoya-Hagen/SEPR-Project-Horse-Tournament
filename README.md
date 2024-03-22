@@ -19,6 +19,7 @@ Vergessen Sie nicht im Projekt ihren Namen und Matrikelnummer zu ersetzen.
 | 14.03. | 15:30 | 4h | 1 | BE, test |
 | 17.03. | 15:00 | 6h | 1, 2 | FE, BE |
 | 18.03. | 17:15 | 0.25h | 2, 10 | adding javaDoc |
+| 19.03. | 07:00 | 5,5h | 3 | BE, FE |
 
 
-**Gesamtsumme der Zeit**: 21.25h
+**Gesamtsumme der Zeit**: 26.75h
