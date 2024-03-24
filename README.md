@@ -14,13 +14,14 @@ Vergessen Sie nicht im Projekt ihren Namen und Matrikelnummer zu ersetzen.
 | Datum | Startzeit | Dauer | Story-ID | Tätigkeit |
 |-------|-----------|-------|----------|-----------|
 | 11.03. | 17:00 | 4h | none | set-up |
-| 12.03. | 22:00 | 1h | 1 | FE |
-| 13.03. | 14:00 | 6h | 1/none | BE, set-up|
+| 12.03. | 22:00 | 1h | 1 | Front-end (FE) |
+| 13.03. | 14:00 | 6h | 1 | Back-end(BE), set-up|
 | 14.03. | 15:30 | 4h | 1 | BE, test |
 | 17.03. | 15:00 | 6h | 1, 2 | FE, BE |
 | 18.03. | 17:15 | 0.25h | 2, 10 | adding javaDoc |
 | 19.03. | 07:00 | 5,5h | 3 | BE, FE |
 | 22.03. | 07:00 | 7h | 4, 15, 5 | BE, FE, formatting, started US5 |
+| 23.03. | 08:00 | 6h | 5 | FE |
 
 
-**Gesamtsumme der Zeit**: 33.75h
+**Gesamtsumme der Zeit**: 39.75h
