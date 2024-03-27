@@ -33,11 +33,20 @@ export class TournamentComponent {
   }
 
   reloadTournaments() {
+    if (this.searchStartingEarliest == null || this.searchStartingEarliest === "") {
+      delete this.searchParams.startDate;
+    } else {
+      this.searchParams.startDate = new Date(this.searchStartingEarliest);
+    }
+    if (this.searchStartingLatest == null || this.searchStartingLatest === "") {
+      delete this.searchParams.endDate;
+    } else {
+      this.searchParams.endDate = new Date(this.searchStartingLatest);
+    }
     this.service.search(this.searchParams)
       .subscribe({
         next: (data: TournamentListDto[]) => {
           this.tournaments = data;
-          this.sortTournaments();
         },
         error: error => {
           console.error('Error fetching tournaments', error);
@@ -50,17 +59,11 @@ export class TournamentComponent {
     this.searchChangedObservable.next();
   }
 
-  sortTournaments(): void {
-    this.tournaments.sort((a, b) => {
-      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-    });
-  }
 
   loadTournaments(): void {
     this.service.getAll()
       .subscribe((tournaments: TournamentListDto[]) => {
         this.tournaments = tournaments;
-        this.sortTournaments();
       }, error => {
         console.error('Error fetching tournaments', error);
         this.notification.error(error.message.message, 'Could Not Fetch Tournaments');

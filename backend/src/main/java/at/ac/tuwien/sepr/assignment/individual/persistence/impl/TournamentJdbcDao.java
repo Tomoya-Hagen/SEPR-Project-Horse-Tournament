@@ -30,9 +30,16 @@ public class TournamentJdbcDao implements TournamentDao {
       + "    t.id as \"id\", t.name as \"name\", t.start_date as \"start_date\", t.end_date as \"end_date\""
       + " FROM " + TABLE_NAME + " t"
       + " WHERE (:name IS NULL OR UPPER(t.name) LIKE UPPER('%'||:name||'%'))"
-      + "  AND (:startDate IS NULL OR :startDate <= t.start_date)"
-      + "  AND (:endDate IS NULL OR :endDate >= t.end_date)";
-  // TODO: verify
+      + "  AND ("
+      + "(:startDate IS NULL OR :startDate <= t.start_date) AND (:endDate IS NULL OR :endDate >= t.end_date)"
+      + " OR "
+      + "(:startDate IS NULL OR :startDate <= t.start_date) AND (:endDate IS NULL OR :endDate >= t.start_date)"
+      + " OR "
+      + "(:startDate IS NULL OR :startDate <= t.end_date) AND (:endDate IS NULL OR :endDate >= t.end_date)"
+      + " OR "
+      + "(:startDate IS NULL OR :startDate >= t.start_date) AND (:endDate IS NULL OR :endDate <= t.end_date)"
+      + ")"
+      + " ORDER BY t.start_date";
   private static final String SQL_CREATE = "INSERT INTO "
       + TABLE_NAME + "(name, start_date, end_date) "
       + "VALUES (?, ?, ?)";
