@@ -16,6 +16,7 @@ import {ConfirmDeleteDialogComponent} from './component/confirm-delete-dialog/co
 import {TournamentCreateComponent} from './component/tournament/tournament-create/tournament-create.component';
 import {TournamentStandingsComponent} from './component/tournament/tournament-standings/tournament-standings.component';
 import {TournamentStandingsBranchComponent} from './component/tournament/tournament-standings/tournament-standings-branch/tournament-standings-branch.component';
+import { TournamentComponent } from './component/tournament/tournament/tournament.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import {TournamentStandingsBranchComponent} from './component/tournament/tournam
     HorseCreateEditComponent,
     AutocompleteComponent,
     ConfirmDeleteDialogComponent,
+    TournamentComponent,
     TournamentCreateComponent,
     TournamentStandingsComponent,
     TournamentStandingsBranchComponent,

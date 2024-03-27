@@ -1,58 +1,58 @@
 <div class="d-flex flex-row w-auto">
-<button class="btn btn-primary mr-1" (click)="reloadTournaments()" aria-label="Reload tournaments">
-    <i class="bi bi-arrow-clockwise"></i>
-    Reload
-</button>
-<span style="flex: 1"></span>
-<a class="btn btn-secondary" routerLink="create" aria-label="New tournament">
-    <i class="bi bi-plus-lg"></i>
-    New tournament
-</a>
+  <button class="btn btn-primary mr-1" (click)="reloadTournaments()" aria-label="Reload tournaments">
+      <i class="bi bi-arrow-clockwise"></i>
+      Reload
+  </button>
+  <span style="flex: 1"></span>
+  <a class="btn btn-secondary" routerLink="create" aria-label="New tournament">
+      <i class="bi bi-plus-lg"></i>
+      New tournament
+  </a>
 </div>
 
 <form class="d-flex flex-row w-auto mb-3" (submit)="reloadHTournaments()">
-    <button type="submit" hidden="hidden">submit</button>
-    <div class="flex-grow-1">
-      <label for="searchTournamentName" class="col-form-label">
-        Name
-      </label>
-      <input type="text" id="searchTournamentName" name="searchTournamentName"
-             class="form-control"
-             [(ngModel)]="searchParams.name"
-             (ngModelChange)="searchChanged()"
-             >
-    </div>
-    <div class="ms-1">
-      <label for="searchHorseBornEarliest" class="col-form-label">
-        Date from
-      </label>
-      <!-- pattern and placeholder are fallbacks for browser, that use a simple text input for type="date"
-           The date format of the plain HTML date input, in browser that support it is, sadly, not changeable in a cross-browser way
-        -->
-      <input type="date" id="searchHorseBornEarliest" name="searchHorseBornEarliest"
-             pattern="\d{4}-\d{2}-\d{2}"
-             placeholder="yyyy-mm-dd"
-             class="form-control"
-             [(ngModel)]="searchStartingEarliest"
-             (ngModelChange)="searchChanged()"
-             >
-    </div>
-    <div class="ms-1">
-      <label for="searchHorseBornLatest" class="col-form-label">
-        Date to
-      </label>
-      <!-- pattern and placeholder are fallbacks for browser, that use a simple text input for type="date"
-           The date format of the plain HTML date input, in browser that support it is, sadly, not changeable in a cross-browser way
-        -->
-      <input type="date" id="searchHorseBornLatest" name="searchHorseBornLatest"
-             pattern="\d{4}-\d{2}-\d{2}"
-             placeholder="yyyy-mm-dd"
-             class="form-control"
-             [(ngModel)]="searchStartingLatest"
-             (ngModelChange)="searchChanged()"
-             >
-    </div>
-  </form>
+  <button type="submit" hidden="hidden">submit</button>
+  <div class="flex-grow-1">
+    <label for="searchTournamentName" class="col-form-label">
+      Name
+    </label>
+    <input type="text" id="searchTournamentName" name="searchTournamentName"
+            class="form-control"
+            [(ngModel)]="searchParams.name"
+            (ngModelChange)="searchChanged()"
+            >
+  </div>
+  <div class="ms-1">
+    <label for="searchHorseBornEarliest" class="col-form-label">
+      Date from
+    </label>
+    <!-- pattern and placeholder are fallbacks for browser, that use a simple text input for type="date"
+          The date format of the plain HTML date input, in browser that support it is, sadly, not changeable in a cross-browser way
+      -->
+    <input type="date" id="searchHorseBornEarliest" name="searchHorseBornEarliest"
+            pattern="\d{4}-\d{2}-\d{2}"
+            placeholder="yyyy-mm-dd"
+            class="form-control"
+            [(ngModel)]="searchStartingEarliest"
+            (ngModelChange)="searchChanged()"
+            >
+  </div>
+  <div class="ms-1">
+    <label for="searchHorseBornLatest" class="col-form-label">
+      Date to
+    </label>
+    <!-- pattern and placeholder are fallbacks for browser, that use a simple text input for type="date"
+          The date format of the plain HTML date input, in browser that support it is, sadly, not changeable in a cross-browser way
+      -->
+    <input type="date" id="searchHorseBornLatest" name="searchHorseBornLatest"
+            pattern="\d{4}-\d{2}-\d{2}"
+            placeholder="yyyy-mm-dd"
+            class="form-control"
+            [(ngModel)]="searchStartingLatest"
+            (ngModelChange)="searchChanged()"
+            >
+  </div>
+</form>
 
 <div class="mt-3">
 <table class="table table-hover">
@@ -67,8 +67,8 @@
     <tbody>
     <tr *ngFor="let tournament of tournaments" class="center-td">
         <td>{{tournament.name}}</td>
-        <td>{{tournament.startDate.toLocaleDateString()}}</td>
-        <td>{{tournament.endDate.toLocaleDateString()}}</td>
+        <td>{{tournament.startDate}}</td>
+        <td>{{tournament.endDate}}</td>
         <td>
         <div class="btn-group">
             <a class="btn btn-sm responsive-info-button"

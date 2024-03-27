@@ -56,9 +56,20 @@ export class TournamentService {
   }
 
 
+  /**
+   * Create a new tournament in the system.
+   *
+   * @param tournament the tournament that should be created
+   * @returns an Observable for the created tournament
+   */
   public create(tournament: TournamentCreateDto): Observable<TournamentDetailDto> {
-    // TODO this is not implemented yet!
-    return throwError(() => ({message: "Not implemented yet"}));
+    if (!tournament) {
+      return throwError(() => new ErrorDto("No tournament provided"));
+    }
+    return this.http.post<TournamentDetailDto>(
+      baseUri,
+      tournament
+    )
   }
 
 }
