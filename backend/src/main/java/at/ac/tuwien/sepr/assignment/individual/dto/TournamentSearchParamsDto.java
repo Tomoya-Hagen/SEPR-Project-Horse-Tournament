@@ -7,12 +7,11 @@ import java.time.LocalDate;
 /**
  * DTO to bundle the query parameters used in searching tournaments.
  * */
-public record TournamentSearchDto(
+public record TournamentSearchParamsDto(
     String name,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     LocalDate startDate,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    LocalDate endDate,
-    Integer limit
+    LocalDate endDate
 ) {
 }
