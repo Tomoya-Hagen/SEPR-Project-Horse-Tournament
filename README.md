@@ -22,6 +22,7 @@ Vergessen Sie nicht im Projekt ihren Namen und Matrikelnummer zu ersetzen.
 | 19.03. | 07:00 | 5,5h | 3 | BE, FE |
 | 22.03. | 07:00 | 7h | 4, 15, 5 | BE, FE, formatting, started US5 |
 | 23.03. | 08:00 | 6h | 5 | FE |
+| 27.03. | 09:00 | 8h | 5, 6 | BE, FE, DB |
 
 
-**Gesamtsumme der Zeit**: 39.75h
+**Gesamtsumme der Zeit**: 47.75h
