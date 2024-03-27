@@ -2,8 +2,10 @@
 -- the IDs are hardcoded to enable references between further test data
 -- negative IDs are used to not interfere with user-entered data and allow clean deletion of test data
 
+DELETE FROM tournament_horses WHERE tournament_id < 0 AND horse_id < 0;
+DELETE FROM tournament WHERE id < 0;
 DELETE FROM horse WHERE id < 0;
-DELETE  FROM breed WHERE id < 0;
+DELETE FROM breed WHERE id < 0;
 
 INSERT INTO breed (id, name)
 VALUES
