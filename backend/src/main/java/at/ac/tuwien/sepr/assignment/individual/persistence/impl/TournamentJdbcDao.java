@@ -3,7 +3,6 @@ package at.ac.tuwien.sepr.assignment.individual.persistence.impl;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSelectionDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentCreateDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
-import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
 import at.ac.tuwien.sepr.assignment.individual.entity.Tournament;
 import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepr.assignment.individual.persistence.TournamentDao;
@@ -26,7 +25,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static final String TABLE_NAME = "tournament";
-  private static final String SQL_SELECT_SEARCH = "SELECT "
+  private static final String SQL_SELECT_SEARCH_TOURNAMENT = "SELECT "
       + "    t.id as \"id\", t.name as \"name\", t.start_date as \"start_date\", t.end_date as \"end_date\""
       + " FROM " + TABLE_NAME + " t"
       + " WHERE (:name IS NULL OR UPPER(t.name) LIKE UPPER('%'||:name||'%'))"
@@ -43,12 +42,6 @@ public class TournamentJdbcDao implements TournamentDao {
   private static final String SQL_CREATE = "INSERT INTO "
       + TABLE_NAME + "(name, start_date, end_date) "
       + "VALUES (?, ?, ?)";
-  private static final String SQL_ASSOCIATE_HORSE_WITH_TOURNAMENT =
-      "INSERT INTO tournament_horses (tournament_id, horse_id) VALUES (?, ?)";
-
-  private static final String SQL_HORSE_BY_ID_TOURNAMENTS = "SELECT horse_id, entry_number, round_reached, tournament_id"
-      + " FROM tournament_horses"
-      + " WHERE tournament_id = ? ";
 
   private static final String SQL_FIND_TOURNAMENT_ID = "SELECT "
       + "    t.id as \"id\", t.name as \"name\", t.start_date as \"start_date\", t.end_date as \"end_date\""
@@ -57,6 +50,13 @@ public class TournamentJdbcDao implements TournamentDao {
       + "  AND (:startDate IS NULL OR t.start_date = :startDate)"
       + "  AND (:endDate IS NULL OR t.end_date = :endDate)";
 
+  private static final String SQL_SEARCH_TOURNAMENT_BY_ID = "SELECT "
+      + " id, name, start_date, end_date"
+      + " FROM " + TABLE_NAME
+      + " WHERE tournament_id = ?";
+
+  private static final String SQL_ASSOCIATE_HORSE_WITH_TOURNAMENT =
+      "INSERT INTO " + " tournament_horses " + " (tournament_id, horse_id) VALUES (?, ?)";
 
   private final JdbcTemplate jdbcTemplate;
   private final NamedParameterJdbcTemplate jdbcNamed;
@@ -77,23 +77,16 @@ public class TournamentJdbcDao implements TournamentDao {
         .setEndDate(rs.getDate("end_date").toLocalDate());
   }
 
-  private HorseTournament mapHorseRow(ResultSet rs, int rowNum) throws SQLException {
-    return new HorseTournament(
-        rs.getLong("horse_id"),
-        rs.getLong("tournament_id"),
-        rs.getInt("entry_number"),
-        rs.getInt("round_reached")
-    );
-  }
 
   @Override
   public Collection<Tournament> search(TournamentSearchParamsDto searchParams) {
     LOG.trace("search({})", searchParams);
-    String query = SQL_SELECT_SEARCH;
+    String query = SQL_SELECT_SEARCH_TOURNAMENT;
     var params = new BeanPropertySqlParameterSource(searchParams);
     params.registerSqlType("name", Types.VARCHAR);
     return jdbcNamed.query(query, params, this::mapRow);
   }
+
 
   @Override
   public Tournament create(TournamentCreateDto tournament) throws FatalException {
@@ -144,9 +137,11 @@ public class TournamentJdbcDao implements TournamentDao {
         .setEndDate(tournament.endDate());
   }
 
+
   @Override
-  public Collection<HorseTournament> getHorseByIDTournaments(Long id) {
-    return jdbcTemplate.query(SQL_HORSE_BY_ID_TOURNAMENTS, this::mapHorseRow, id);
+  public Tournament getById(Long tournamentId) {
+    LOG.trace("getById({})", tournamentId);
+    return jdbcTemplate.query(SQL_SEARCH_TOURNAMENT_BY_ID, this::mapRow, tournamentId).get(0);
   }
 
 }

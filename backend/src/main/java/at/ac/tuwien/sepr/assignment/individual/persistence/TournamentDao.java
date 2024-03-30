@@ -1,13 +1,10 @@
 package at.ac.tuwien.sepr.assignment.individual.persistence;
 
-import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentCreateDto;
-import at.ac.tuwien.sepr.assignment.individual.dto.TournamentDetailParticipantDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
-import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
 import at.ac.tuwien.sepr.assignment.individual.entity.Tournament;
+
 import java.util.Collection;
-import java.util.List;
 
 public interface TournamentDao {
 
@@ -21,6 +18,7 @@ public interface TournamentDao {
    */
   Collection<Tournament> search(TournamentSearchParamsDto searchParams);
 
+
   /**
    * Create a new tournament with the given data.
    *
@@ -29,11 +27,6 @@ public interface TournamentDao {
    */
   Tournament create(TournamentCreateDto tournament);
 
-  /**
-   * Get the horses participating in the tournament with the given id.
-   *
-   * @param id the id of the tournament
-   * @return A collection of the horses participating in the tournament
-   */
-  Collection<HorseTournament> getHorseByIDTournaments(Long id);
+
+  Tournament getById(Long tournamentId);
 }
