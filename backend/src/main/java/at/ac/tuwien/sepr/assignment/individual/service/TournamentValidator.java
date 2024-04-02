@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.assignment.individual.service;
 
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentCreateDto;
+import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsDto;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,4 +44,29 @@ public class TournamentValidator {
       throw new ValidationException("Validation of tournament for create failed", validationErrors);
     }
   }
+
+  public void validateForStandings(TournamentStandingsDto tournament) throws ValidationException {
+    LOG.trace("validateForStandings({})", tournament);
+    List<String> validationErrors = new ArrayList<>();
+
+    if (tournament == null) {
+      throw new ValidationException("No tournament given", validationErrors);
+    }
+    if (tournament.id() == null) {
+      validationErrors.add("No id given");
+    }
+    if (tournament.name() == null) {
+      validationErrors.add("No name given");
+    }
+    if (tournament.participants() == null || tournament.participants().size() != 8) {
+      validationErrors.add("No 8 horses given");
+    }
+    if (tournament.tree() == null) {
+      validationErrors.add("No tree given");
+    }
+    if (!validationErrors.isEmpty()) {
+      throw new ValidationException("Validation of tournament for standings failed", validationErrors);
+    }
+  }
+
 }
