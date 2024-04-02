@@ -51,12 +51,14 @@ public class TournamentJdbcDao implements TournamentDao {
       + "  AND (:endDate IS NULL OR t.end_date = :endDate)";
 
   private static final String SQL_SEARCH_TOURNAMENT_BY_ID = "SELECT "
-      + " id, name, start_date, end_date"
-      + " FROM " + TABLE_NAME
-      + " WHERE tournament_id = ?";
+      + "    t.id as \"id\", t.name as \"name\", t.start_date as \"start_date\", t.end_date as \"end_date\""
+      + " FROM " + TABLE_NAME + " t"
+      + " WHERE id = ?";
 
   private static final String SQL_ASSOCIATE_HORSE_WITH_TOURNAMENT =
       "INSERT INTO " + " tournament_horses " + " (tournament_id, horse_id) VALUES (?, ?)";
+  private static final String SQL_SET_ENTRY_NUMBER_AND_REACHED_ROUND = "UPDATE "
+      + " tournament_horses " + " SET entry_number = ?, round_reached = ? WHERE horse_id = ? AND tournament_id = ?";
 
   private final JdbcTemplate jdbcTemplate;
   private final NamedParameterJdbcTemplate jdbcNamed;
@@ -128,6 +130,7 @@ public class TournamentJdbcDao implements TournamentDao {
       if (rowAffected == 0) {
         throw new FatalException("Horse could not be associated with tournament");
       }
+      updateStandings(tournamentID, participantDto.id(), 0, 0);
     }
 
     return new Tournament()
@@ -138,10 +141,28 @@ public class TournamentJdbcDao implements TournamentDao {
   }
 
 
+
+
   @Override
   public Tournament getById(Long tournamentId) {
     LOG.trace("getById({})", tournamentId);
     return jdbcTemplate.query(SQL_SEARCH_TOURNAMENT_BY_ID, this::mapRow, tournamentId).get(0);
+  }
+
+  @Override
+  public void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached) throws FatalException {
+    LOG.trace("updateStandings({}, {}, {}, {})", tournamentId, horseId, entryNumber, roundReached);
+    int updatedRows = jdbcTemplate.update(
+        SQL_SET_ENTRY_NUMBER_AND_REACHED_ROUND,
+        entryNumber,
+        roundReached,
+        horseId,
+        tournamentId
+    );
+    if (updatedRows != 1) {
+      throw new FatalException("Entry number and round reached could not be set for horse");
+    }
+
   }
 
 }

@@ -29,4 +29,6 @@ public interface TournamentDao {
 
 
   Tournament getById(Long tournamentId);
+
+  void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached);
 }
