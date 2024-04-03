@@ -61,7 +61,7 @@
         <th>Name</th>
         <th>Starting Date</th>
         <th>Ending Date</th>
-        <th class="min-width">Actions</th>
+        <th class="min-width">Results</th>
     </tr>
     </thead>
     <tbody>
@@ -71,8 +71,8 @@
         <td>{{tournament.endDate}}</td>
         <td>
         <div class="btn-group">
-            <a class="btn btn-sm responsive-info-button"
-                aria-label="Show tournament details">
+            <a class="btn btn-sm responsive-info-button" [routerLink]="['standings', tournament.id]"
+                aria-label="Show tournament standings">
                 <i class="bi bi-info-lg"></i>
             </a>
         </div>

@@ -25,11 +25,39 @@ export class TournamentStandingsComponent implements OnInit {
   }
 
   public ngOnInit() {
-    // TODO to be implemented.
+    this.service.getStandings(this.route.snapshot.params['id'])
+      .subscribe({
+        next: data => {
+          this.standings = data;
+        },
+        error: error => {
+          console.error(error.message, error);
+          this.notification.error(this.errorFormatter.format(error), "Could Not Get Tournament Standings", {
+            enableHtml: true,
+            timeOut: 10000,
+          });
+        }
+      });
   }
 
   public submit(form: NgForm) {
-    // TODO to be implemented.
+    if (form.invalid)
+      return;
+    else
+      this.service.saveStandings(this.standings!)
+        .subscribe({
+          next: data => {
+            this.notification.success(`Tournament standings saved`, "Tournament standings saved successfully");
+            this.location.back();
+          },
+          error: error => {
+            console.error(error.message, error);
+            this.notification.error(this.errorFormatter.format(error), "Could Not Save Tournament Standings", {
+              enableHtml: true,
+              timeOut: 10000,
+            });
+          }
+        });
   }
 
   public generateFirstRound() {

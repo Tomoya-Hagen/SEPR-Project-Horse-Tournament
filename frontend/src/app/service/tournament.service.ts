@@ -72,4 +72,21 @@ export class TournamentService {
     )
   }
 
+  public getStandings(id: number): Observable<TournamentStandingsDto> {
+    if (!id) {
+      return throwError(() => new ErrorDto("No tournament id provided"));
+    }
+    return this.http.get<TournamentStandingsDto>(`${baseUri}/standings/${id}`);
+  }
+
+  public saveStandings(tournamentStanding: TournamentStandingsDto): Observable<TournamentStandingsDto> {
+    if(!tournamentStanding) {
+      return throwError(() => new ErrorDto("No tournament standing provided"));
+    }
+    return this.http.patch<TournamentStandingsDto>(
+      `${baseUri}/standings/${tournamentStanding.id}`,
+      tournamentStanding
+    )
+  }
+
 }
