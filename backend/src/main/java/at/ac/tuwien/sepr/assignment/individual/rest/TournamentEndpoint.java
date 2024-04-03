@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.assignment.individual.dto.TournamentCreateDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
+import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsDto;
 import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepr.assignment.individual.service.TournamentService;
@@ -12,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +47,21 @@ public class TournamentEndpoint {
     LOG.info("POST " + BASE_PATH);
     LOG.debug("request parameters: {}", tournament);
     return ResponseEntity.status(HttpStatus.CREATED).body(service.create(tournament));
+  }
+
+  @GetMapping("standings/{id}")
+  public ResponseEntity<TournamentStandingsDto> getStandings(@PathVariable("id") Long tournamentId) throws NotFoundException {
+    LOG.info("GET " + BASE_PATH + "/standings" + "/{}", tournamentId);
+    LOG.debug("request parameters: {}", tournamentId);
+    return ResponseEntity.ok(service.getStandingsByTournamentId(tournamentId));
+  }
+
+  @PatchMapping("standings/{id}")
+  public ResponseEntity<TournamentStandingsDto> updateStandings(@PathVariable("id") Long tournamentId,
+                                                                @RequestBody TournamentStandingsDto standings) throws NotFoundException, ValidationException {
+    LOG.info("PATCH " + BASE_PATH + "/standings" + "/{}", tournamentId);
+    LOG.debug("request parameters: {}", tournamentId);
+    return ResponseEntity.ok(service.updateStandings(standings));
   }
 
 }

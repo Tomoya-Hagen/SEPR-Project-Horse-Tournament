@@ -4,6 +4,9 @@ import at.ac.tuwien.sepr.assignment.individual.dto.TournamentCreateDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
+import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsDto;
+import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsTreeDto;
+import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
 import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 
@@ -31,4 +34,10 @@ public interface TournamentService {
    * @throws ValidationException if the data given for the tournament is in itself incorrect
    */
   TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException, NotFoundException;
+
+  TournamentStandingsDto getStandingsByTournamentId(Long tournamentId) throws NotFoundException;
+
+  TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws NotFoundException, ValidationException;
+
+  int fillTree(TournamentStandingsTreeDto standings, List<HorseTournament> horseTournaments, int entryNumber);
 }

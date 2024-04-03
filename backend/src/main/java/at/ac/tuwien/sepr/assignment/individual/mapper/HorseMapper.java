@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.assignment.individual.mapper;
 import at.ac.tuwien.sepr.assignment.individual.dto.BreedDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseListDto;
+import at.ac.tuwien.sepr.assignment.individual.dto.HorseSelectionDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
 import java.lang.invoke.MethodHandles;
@@ -60,6 +61,18 @@ public class HorseMapper {
         horse.getHeight(),
         horse.getWeight(),
         breedFromMap(horse, breeds)
+    );
+  }
+
+  public HorseSelectionDto entityToSelectionDto(Horse horse) {
+    LOG.trace("entityToDto({})", horse);
+    if (horse == null) {
+      return null;
+    }
+    return new HorseSelectionDto(
+        horse.getId(),
+        horse.getName(),
+        horse.getDateOfBirth()
     );
   }
 
