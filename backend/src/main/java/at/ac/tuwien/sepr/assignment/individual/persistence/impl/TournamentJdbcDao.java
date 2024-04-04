@@ -130,7 +130,7 @@ public class TournamentJdbcDao implements TournamentDao {
       if (rowAffected == 0) {
         throw new FatalException("Horse could not be associated with tournament");
       }
-      updateStandings(tournamentID, participantDto.id(), 0, 0);
+      updateStandings(tournamentID, participantDto.id(), -1, 0);
     }
 
     return new Tournament()

@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.assignment.individual.entity;
 
 public class HorseTournament {
   private final Long horseId;
-  private Long tournamentId;
+  private final Long tournamentId;
   private int entryNumber;
   private int roundReached;
 
@@ -31,6 +31,9 @@ public class HorseTournament {
 
   public void setRoundReached(int roundReached) {
     this.roundReached = roundReached;
+  }
+  public Long getTournamentId() {
+    return tournamentId;
   }
 
 }

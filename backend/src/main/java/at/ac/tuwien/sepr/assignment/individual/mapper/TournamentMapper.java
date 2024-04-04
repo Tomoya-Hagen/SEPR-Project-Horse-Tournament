@@ -96,7 +96,7 @@ public class TournamentMapper {
     TournamentStandingsTreeDto root = generateTree(null, 1);
     int number = 0;
     for (HorseTournament participant : horseTournaments) {
-      if (participant.getEntryNumber() == 0) {
+      if (participant.getEntryNumber() == -1) {
         number++;
       }
     }
@@ -136,7 +136,11 @@ public class TournamentMapper {
   private TournamentStandingsTreeDto fillStandingsTree(TournamentStandingsTreeDto root, List<TournamentDetailParticipantDto> participants, int depth) {
     LOG.trace("fillStandingsTree({})", root);
     if (participants.size() == 1) {
-      root = new TournamentStandingsTreeDto(participants.get(0), root.branches());
+      if (participants.get(0).roundReached() != 0) {
+        root = new TournamentStandingsTreeDto(participants.get(0), root.branches());
+      } else {
+        root = new TournamentStandingsTreeDto(null, root.branches());
+      }
       return root;
     }
     int maxRound = 0;
@@ -165,7 +169,7 @@ public class TournamentMapper {
     return new HorseTournament(
         horse.horseId(),
         tournamentId,
-        0,
+        horse.entryNumber(),
         0
     );
 
