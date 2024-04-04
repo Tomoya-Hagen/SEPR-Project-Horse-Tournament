@@ -19,7 +19,7 @@ public interface HorseService {
    * @param searchParameters the search parameters to use in filtering.
    * @return the horses where the given fields match.
    */
-  Stream<HorseListDto> search(HorseSearchDto searchParameters);
+  Stream<HorseListDto> search(HorseSearchDto searchParameters) throws NotFoundException;
 
   /**
    * Updates the horse with the ID given in {@code horse}

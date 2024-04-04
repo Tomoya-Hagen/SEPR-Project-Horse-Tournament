@@ -49,7 +49,6 @@ public class HorseValidator {
     validateHelper(horse, validationErrors);
 
     if (!validationErrors.isEmpty()) {
-      LOG.warn("Validation of horse for create failed: {}", validationErrors);
       throw new ValidationException("Validation of horse for create failed", validationErrors);
     }
   }

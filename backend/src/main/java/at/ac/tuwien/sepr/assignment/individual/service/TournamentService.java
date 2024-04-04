@@ -24,7 +24,7 @@ public interface TournamentService {
    * @param searchParams the search parameters to use in filtering.
    * @return the tournaments where the given fields match.
    */
-  Stream<TournamentListDto> search(TournamentSearchParamsDto searchParams);
+  Stream<TournamentListDto> search(TournamentSearchParamsDto searchParams) throws NotFoundException;
 
   /**
    * Create a tournament with the data given.

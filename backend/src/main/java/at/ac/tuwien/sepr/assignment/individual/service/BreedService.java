@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.assignment.individual.service;
 
 import at.ac.tuwien.sepr.assignment.individual.dto.BreedDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.BreedSearchDto;
+import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
+
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -11,7 +13,7 @@ public interface BreedService {
    *
    * @return a stream of all stored breeds.
    */
-  Stream<BreedDto> allBreeds();
+  Stream<BreedDto> allBreeds() throws NotFoundException;
 
   /**
    * Retrieve all stored breeds, that have one of the given IDs.
@@ -20,7 +22,7 @@ public interface BreedService {
    * @param breedIds the set of IDs to find breeds for.
    * @return a stream of all found breeds with an ID in {@code breedIds}
    */
-  Stream<BreedDto> findBreedsByIds(Set<Long> breedIds);
+  Stream<BreedDto> findBreedsByIds(Set<Long> breedIds) throws NotFoundException;
 
   /**
    * Retrieve all stored breeds, that match the given parameters.
@@ -29,5 +31,5 @@ public interface BreedService {
    * @param searchParams parameters to search breeds by
    * @return a stream of breeds matching the parameters
    */
-  Stream<BreedDto> search(BreedSearchDto searchParams);
+  Stream<BreedDto> search(BreedSearchDto searchParams) throws NotFoundException;
 }
