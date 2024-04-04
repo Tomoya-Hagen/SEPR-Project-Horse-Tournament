@@ -15,10 +15,7 @@ import java.util.List;
 public class TournamentValidator {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private void validateHelper(TournamentCreateDto tournament, List<String> validationErrors) throws ValidationException {
-    if (tournament == null) {
-      throw new ValidationException("No tournament given", validationErrors);
-    }
+  private void validateHelper(TournamentCreateDto tournament, List<String> validationErrors) {
     if (tournament.name() == null) {
       validationErrors.add("No name given");
     }
@@ -41,7 +38,9 @@ public class TournamentValidator {
     validateHelper(tournament, validationErrors);
 
     if (!validationErrors.isEmpty()) {
-      throw new ValidationException("Validation of tournament for create failed", validationErrors);
+      String errorMessage = "Validation of tournament for create failed: ";
+      LOG.warn(errorMessage);
+      throw new ValidationException(errorMessage, validationErrors);
     }
   }
 
@@ -49,9 +48,6 @@ public class TournamentValidator {
     LOG.trace("validateForStandings({})", tournament);
     List<String> validationErrors = new ArrayList<>();
 
-    if (tournament == null) {
-      throw new ValidationException("No tournament given", validationErrors);
-    }
     if (tournament.id() == null) {
       validationErrors.add("No id given");
     }
@@ -65,8 +61,9 @@ public class TournamentValidator {
       validationErrors.add("No tree given");
     }
     if (!validationErrors.isEmpty()) {
-      throw new ValidationException("Validation of tournament for standings failed", validationErrors);
+      String errorMessage = "Validation of tournament for standings failed: " + validationErrors;
+      LOG.warn(errorMessage);
+      throw new ValidationException(errorMessage, validationErrors);
     }
   }
-
 }

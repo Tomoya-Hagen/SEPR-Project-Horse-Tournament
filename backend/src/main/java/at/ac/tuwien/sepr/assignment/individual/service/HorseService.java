@@ -52,7 +52,7 @@ public interface HorseService {
    * @return the created horse
    * @throws ValidationException if the data given for the horse is in itself incorrect
    */
-  HorseDetailDto create(HorseDetailDto horse) throws ValidationException;
+  HorseDetailDto create(HorseDetailDto horse) throws ValidationException, NotFoundException;
 
   /**
    * Delete the horse with the given ID.

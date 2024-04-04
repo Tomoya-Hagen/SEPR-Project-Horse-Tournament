@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class BreedServiceImpl implements BreedService {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-  private BreedDao dao;
-  private BreedMapper mapper;
+  private final BreedDao dao;
+  private final BreedMapper mapper;
 
   public BreedServiceImpl(BreedDao dao, BreedMapper mapper) {
     this.dao = dao;
@@ -33,6 +33,11 @@ public class BreedServiceImpl implements BreedService {
   @Override
   public Stream<BreedDto> findBreedsByIds(Set<Long> breedIds) {
     LOG.trace("findBreedsByIds({})", breedIds);
+    if (breedIds == null || breedIds.isEmpty()) {
+      String message = "breedIds must not be null or empty";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     return dao.findBreedsById(breedIds)
         .stream()
         .map(mapper::entityToDto);
@@ -41,6 +46,11 @@ public class BreedServiceImpl implements BreedService {
   @Override
   public Stream<BreedDto> search(BreedSearchDto searchParams) {
     LOG.trace("search({})", searchParams);
+    if (searchParams == null) {
+      String message = "Search parameters must not be null";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     return dao.search(searchParams)
         .stream()
         .map(mapper::entityToDto);

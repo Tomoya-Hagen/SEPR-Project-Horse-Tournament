@@ -32,6 +32,7 @@ public interface TournamentService {
    * @param tournament the tournament to create
    * @return the created tournament
    * @throws ValidationException if the data given for the tournament is in itself incorrect
+   * @throws NotFoundException if a horse with the given id does not exist
    */
   TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException, NotFoundException;
 

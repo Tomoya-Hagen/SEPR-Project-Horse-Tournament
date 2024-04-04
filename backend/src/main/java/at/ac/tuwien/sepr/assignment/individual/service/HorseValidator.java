@@ -13,10 +13,7 @@ import org.springframework.stereotype.Component;
 public class HorseValidator {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private void validateHelper(HorseDetailDto horse, List<String> validationErrors) throws ValidationException {
-    if (horse == null) {
-      throw new ValidationException("No horse given", validationErrors);
-    }
+  private void validateHelper(HorseDetailDto horse, List<String> validationErrors) {
     if (horse.name() == null) {
       validationErrors.add("No name given");
     }
@@ -52,6 +49,7 @@ public class HorseValidator {
     validateHelper(horse, validationErrors);
 
     if (!validationErrors.isEmpty()) {
+      LOG.warn("Validation of horse for create failed: {}", validationErrors);
       throw new ValidationException("Validation of horse for create failed", validationErrors);
     }
   }

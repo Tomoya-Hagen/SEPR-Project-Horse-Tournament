@@ -39,13 +39,19 @@ public class HorseServiceImpl implements HorseService {
 
   @Override
   public Stream<HorseListDto> search(HorseSearchDto searchParameters) {
+    LOG.trace("search({})", searchParameters);
+    if (searchParameters == null) {
+      String message = "Search parameters must not be null";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     var horses = dao.search(searchParameters);
-    // First get all breed ids…
+
     var breeds = horses.stream()
         .map(Horse::getBreedId)
         .filter(Objects::nonNull)
         .collect(Collectors.toUnmodifiableSet());
-    // … then get the breeds all at once.
+
     var breedsPerId = breedMapForHorses(breeds);
 
     return horses.stream()
@@ -56,6 +62,11 @@ public class HorseServiceImpl implements HorseService {
   @Override
   public HorseDetailDto update(HorseDetailDto horse) throws NotFoundException, ValidationException, ConflictException {
     LOG.trace("update({})", horse);
+    if (horse == null) {
+      String message = "Horse must not be null";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     validator.validateForUpdate(horse);
     var updatedHorse = dao.update(horse);
     var breeds = breedMapForSingleHorse(updatedHorse);
@@ -66,23 +77,45 @@ public class HorseServiceImpl implements HorseService {
   @Override
   public HorseDetailDto getById(long id) throws NotFoundException {
     LOG.trace("details({})", id);
+    if (id <= 0) {
+      String message = "Id must be greater than zero";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     Horse horse = dao.getById(id);
     var breeds = breedMapForSingleHorse(horse);
     return mapper.entityToDetailDto(horse, breeds);
   }
 
   private Map<Long, BreedDto> breedMapForSingleHorse(Horse horse) {
+    LOG.trace("breeds({})", horse);
+    if (horse == null) {
+      String message = "Horse must not be null";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     return breedMapForHorses(Collections.singleton(horse.getBreedId()));
   }
 
   private Map<Long, BreedDto> breedMapForHorses(Set<Long> horse) {
+    LOG.trace("breeds({})", horse);
+    if (horse == null || horse.isEmpty()) {
+      String message = "Horse must not be null or empty";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     return breedService.findBreedsByIds(horse)
         .collect(Collectors.toUnmodifiableMap(BreedDto::id, Function.identity()));
   }
 
   @Override
-  public HorseDetailDto create(HorseDetailDto horse) throws ValidationException {
+  public HorseDetailDto create(HorseDetailDto horse) throws ValidationException, NotFoundException {
     LOG.trace("create({})", horse);
+    if (horse == null) {
+      String message = "Horse must not be null";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     validator.validateForCreate(horse);
     Horse createdHorse = dao.create(horse);
     var breeds = breedMapForSingleHorse(createdHorse);
@@ -92,8 +125,9 @@ public class HorseServiceImpl implements HorseService {
   @Override
   public void delete(long id) throws NotFoundException {
     LOG.trace("delete({})", id);
-    if (id == 0) { //TODO: check which IDs are invalid
-      throw new NotFoundException("No Horse with id " + id + " exists");
+    if (id <= 0) {
+      LOG.warn("Error occurred while deleting a horse: No horse with id 0 exists");
+      throw new IllegalArgumentException("id must be greater than 0");
     }
     dao.delete(id);
   }

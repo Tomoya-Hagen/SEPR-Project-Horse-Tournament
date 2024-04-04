@@ -51,6 +51,12 @@ public class TournamentServiceImpl implements TournamentService {
 
   @Override
   public Stream<TournamentListDto> search(TournamentSearchParamsDto searchParameters) {
+    LOG.trace("search({})", searchParameters);
+    if (searchParameters == null) {
+      String message = "Search parameters must not be null";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     var tournaments = tournamentDao.search(searchParameters);
     return tournaments.stream()
         .map(tournamentMapper::entityToListDto);
@@ -59,14 +65,25 @@ public class TournamentServiceImpl implements TournamentService {
   @Override
   public TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException, NotFoundException {
     LOG.trace("create({})", tournament);
+    if (tournament == null) {
+      String message = "Tournament must not be null";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     validator.validateForCreate(tournament);
     var createdTournament = tournamentDao.create(tournament);
     var horseTournaments = horseTournamentDao.getHorsesByIDTournament(createdTournament.getId());
     List<TournamentDetailParticipantDto> participantDtos = new ArrayList<>();
     for (HorseSelectionDto participantDto : tournament.participants()) {
-      HorseTournament horseTournament = horseTournaments.stream().filter(ht -> ht.getHorseId().equals(participantDto.id())).findFirst().orElse(null);
+      HorseTournament horseTournament = horseTournaments
+          .stream()
+          .filter(ht -> ht.getHorseId().equals(participantDto.id()))
+          .findFirst()
+          .orElse(null);
       if (horseTournament == null) {
-        throw new NotFoundException("Horse with id " + participantDto.id() + " does not exist");
+        String message = "Horse with id " + participantDto.id() + " does not exist";
+        LOG.warn(message);
+        throw new NotFoundException(message);
       }
       participantDtos.add(tournamentMapper.entityToTournamentDetailParticipantDto(participantDto,
           horseTournament.getEntryNumber(), horseTournament.getRoundReached()));
@@ -79,7 +96,9 @@ public class TournamentServiceImpl implements TournamentService {
     LOG.trace("getStandingsByTournamentId({})", tournamentId);
     Tournament tournament = tournamentDao.getById(tournamentId);
     if (tournamentId == null || tournament == null) {
-      throw new NotFoundException("Tournament with id " + tournamentId + " does not exist");
+      String message = "tournament and its id must not be null";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
     }
     Collection<HorseTournament> horseTournaments = horseTournamentDao.getHorsesByIDTournament(tournamentId);
     Map<Long, HorseSelectionDto> horseMap = new HashMap<>();
@@ -92,20 +111,26 @@ public class TournamentServiceImpl implements TournamentService {
   @Override
   public TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws NotFoundException, ValidationException {
     LOG.trace("updateStandings({})", standings);
+    if (standings == null || standings.participants() == null || standings.participants().isEmpty()) {
+      String message = "Standings does not exist or is invalid";
+      LOG.warn(message);
+      throw new IllegalArgumentException(message);
+    }
     validator.validateForStandings(standings);
     List<HorseTournament> horseTournaments = new ArrayList<>();
     for (TournamentDetailParticipantDto horse : standings.participants()) {
       horseTournaments.add(tournamentMapper.tournamentDetailParticipantDtoToHorseTournament(horse, standings.id()));
     }
-    fillTree(standings.tree(), horseTournaments, 0);
+    fillTree(standings.tree(), horseTournaments, 1);
     for (HorseTournament horse : horseTournaments) {
-      tournamentDao.updateStandings(standings.id(), horse.getHorseId(), horse.getEntryNumber(), horse.getRoundReached());
+      tournamentDao.updateStandings(horse.getTournamentId(), horse.getHorseId(), horse.getEntryNumber(), horse.getRoundReached());
     }
     return getStandingsByTournamentId(standings.id());
   }
 
   @Override
   public int fillTree(TournamentStandingsTreeDto standings, List<HorseTournament> horseTournaments, int entryNumber) {
+    LOG.trace("fillTree({}, {}, {})", standings, horseTournaments, entryNumber);
     if (standings.thisParticipant() != null) {
       for (HorseTournament horseTournament : horseTournaments) {
         if (horseTournament.getHorseId().equals(standings.thisParticipant().horseId())) {
