@@ -3,8 +3,6 @@ package at.ac.tuwien.sepr.assignment.individual.rest;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
-import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
-import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepr.assignment.individual.service.HorseService;
 import java.lang.invoke.MethodHandles;
@@ -45,25 +43,20 @@ public class HorseEndpoint {
   @GetMapping("{id}")
   public HorseDetailDto getById(@PathVariable("id") long id) {
     LOG.info("GET " + BASE_PATH + "/{}", id);
-    try {
-      return service.getById(id);
-    } catch (NotFoundException e) {
-      HttpStatus status = HttpStatus.NOT_FOUND;
-      logClientError(status, "Horse to get details of not found", e);
-      throw new ResponseStatusException(status, e.getMessage(), e);
-    }
+    LOG.debug("request parameters: {}", id);
+    return service.getById(id);
   }
 
 
   @PutMapping("{id}")
-  public HorseDetailDto update(@PathVariable("id") long id, @RequestBody HorseDetailDto toUpdate) throws ValidationException, ConflictException {
+  public HorseDetailDto update(@PathVariable("id") long id, @RequestBody HorseDetailDto toUpdate) {
     LOG.info("PUT " + BASE_PATH + "/{}", toUpdate);
     LOG.debug("Body of request:\n{}", toUpdate);
     try {
       return service.update(toUpdate.withId(id));
-    } catch (NotFoundException e) {
-      HttpStatus status = HttpStatus.NOT_FOUND;
-      logClientError(status, "Horse to update not found", e);
+    } catch (ValidationException e) {
+      HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+      logClientError(status, "Horse to update not valid", e);
       throw new ResponseStatusException(status, e.getMessage(), e);
     }
   }
@@ -74,23 +67,23 @@ public class HorseEndpoint {
   }
 
   @PostMapping
-  public ResponseEntity<HorseDetailDto> create(@RequestBody HorseDetailDto toCreate) throws ValidationException {
+  public ResponseEntity<HorseDetailDto> create(@RequestBody HorseDetailDto toCreate) {
     LOG.info("POST " + BASE_PATH);
     LOG.debug("Body of request:\n{}", toCreate);
-    return ResponseEntity.status(HttpStatus.CREATED).body(service.create(toCreate));
+    try {
+      return ResponseEntity.status(HttpStatus.CREATED).body(service.create(toCreate));
+    } catch (ValidationException e) {
+      HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+      logClientError(status, "Horse to create not valid", e);
+      throw new ResponseStatusException(status, e.getMessage(), e);
+    }
   }
 
   @DeleteMapping("{id}")
-  public ResponseEntity<Void> delete(@PathVariable("id") long id) throws NotFoundException {
+  public ResponseEntity<Void> delete(@PathVariable("id") long id) {
     LOG.info("DELETE " + BASE_PATH + "/{}", id);
     LOG.debug("request parameters: {}", id);
-    try {
-      service.delete(id);
-      return ResponseEntity.noContent().build();
-    } catch (NotFoundException e) {
-      HttpStatus status = HttpStatus.NOT_FOUND;
-      logClientError(status, "Horse to delete not found", e);
-      throw new ResponseStatusException(status, e.getMessage(), e);
-    }
+    service.delete(id);
+    return ResponseEntity.noContent().build();
   }
 }

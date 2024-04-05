@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.stream.Stream;
@@ -36,21 +37,31 @@ public class TournamentEndpoint {
   }
 
   @GetMapping
-  public Stream<TournamentListDto> searchTournaments(TournamentSearchParamsDto searchParameters) {
+  public Stream<TournamentListDto> searchTournaments(TournamentSearchParamsDto searchParameters) throws NotFoundException {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("request parameters: {}", searchParameters);
     return service.search(searchParameters);
   }
 
   @PostMapping
-  public ResponseEntity<TournamentDetailDto> create(@RequestBody TournamentCreateDto tournament) throws ValidationException, NotFoundException {
+  public ResponseEntity<TournamentDetailDto> create(@RequestBody TournamentCreateDto tournament) {
     LOG.info("POST " + BASE_PATH);
     LOG.debug("request parameters: {}", tournament);
-    return ResponseEntity.status(HttpStatus.CREATED).body(service.create(tournament));
+    try {
+      return ResponseEntity.status(HttpStatus.CREATED).body(service.create(tournament));
+    } catch (ValidationException e) {
+      HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+      logClientError(status, "Tournament to create not valid", e);
+      throw new ResponseStatusException(status, e.getMessage(), e);
+    }
+  }
+
+  private void logClientError(HttpStatus status, String message, ValidationException e) {
+    LOG.warn("{} {}: {}: {}", status.value(), message, e.getClass().getSimpleName(), e.getMessage());
   }
 
   @GetMapping("standings/{id}")
-  public ResponseEntity<TournamentStandingsDto> getStandings(@PathVariable("id") Long tournamentId) throws NotFoundException {
+  public ResponseEntity<TournamentStandingsDto> getStandings(@PathVariable("id") Long tournamentId) {
     LOG.info("GET " + BASE_PATH + "/standings" + "/{}", tournamentId);
     LOG.debug("request parameters: {}", tournamentId);
     return ResponseEntity.ok(service.getStandingsByTournamentId(tournamentId));
@@ -58,10 +69,16 @@ public class TournamentEndpoint {
 
   @PatchMapping("standings/{id}")
   public ResponseEntity<TournamentStandingsDto> updateStandings(@PathVariable("id") Long tournamentId,
-                                                                @RequestBody TournamentStandingsDto standings) throws NotFoundException, ValidationException {
+                                                                @RequestBody TournamentStandingsDto standings) {
     LOG.info("PATCH " + BASE_PATH + "/standings" + "/{}", tournamentId);
     LOG.debug("request parameters: {}", tournamentId);
-    return ResponseEntity.ok(service.updateStandings(standings));
+    try {
+      return ResponseEntity.ok(service.updateStandings(standings));
+    } catch (ValidationException e) {
+      HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+      logClientError(status, "Standings could not be updated", e);
+      throw new ResponseStatusException(status, e.getMessage(), e);
+    }
   }
 
 }
