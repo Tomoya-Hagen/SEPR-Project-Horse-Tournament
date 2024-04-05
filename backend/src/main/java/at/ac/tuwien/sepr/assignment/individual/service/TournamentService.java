@@ -30,13 +30,34 @@ public interface TournamentService {
    *
    * @param tournament the tournament to create
    * @return the created tournament
-   * @throws ValidationException if the data given for the tournament is in itself incorrect
+   * @throws ValidationException if the data given for the tournament is invalid
    */
   TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException;
 
+  /**
+   * Get the tournament standings with the given id.
+   *
+   * @param tournamentId the id of the tournament to get the standings for.
+   * @return the standings for the given tournament.
+   */
   TournamentStandingsDto getStandingsByTournamentId(Long tournamentId);
 
+  /**
+   * Update the standings for the given tournament.
+   *
+   * @param standings the standings to update.
+   * @return the updated standings.
+   * @throws ValidationException if the data given for the standings is invalid
+   */
   TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException;
 
+  /**
+   * Fill the tournament standings tree.
+   *
+   * @param standings the standings to fill.
+   * @param horseTournaments the horse tournaments to fill the tree with.
+   * @param entryNumber the entry number to start filling the tree with.
+   * @return the last entry number after filling the tree.
+   */
   int fillTree(TournamentStandingsTreeDto standings, List<HorseTournament> horseTournaments, int entryNumber);
 }

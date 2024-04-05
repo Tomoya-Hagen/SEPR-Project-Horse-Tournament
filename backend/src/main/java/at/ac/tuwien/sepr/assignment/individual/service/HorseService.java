@@ -12,10 +12,11 @@ import java.util.stream.Stream;
 public interface HorseService {
   /**
    * Search for horses in the persistent data store matching all provided fields.
-   * The name is considered a match, if the search string is a substring of the field in horse.
+   * The name is considered a match, if the search string is a substring of the field in horse and there
+   * will be suggestions displayed.
    *
    * @param searchParameters the search parameters to use in filtering.
-   * @return the horses where the given fields match.
+   * @return a stream of the horses where the given fields match.
    */
   Stream<HorseListDto> search(HorseSearchDto searchParameters);
 
@@ -26,7 +27,7 @@ public interface HorseService {
    *
    * @param horse the horse to update
    * @return he updated horse
-   * @throws ValidationException if the update data given for the horse is in itself incorrect (no name …)
+   * @throws ValidationException if the update data given for the horse is invalid
    */
   HorseDetailDto update(HorseDetailDto horse) throws ValidationException;
 
@@ -45,7 +46,7 @@ public interface HorseService {
    *
    * @param horse the horse to create
    * @return the created horse
-   * @throws ValidationException if the data given for the horse is in itself incorrect
+   * @throws ValidationException if the data given for the horse is invalid
    */
   HorseDetailDto create(HorseDetailDto horse) throws ValidationException;
 
