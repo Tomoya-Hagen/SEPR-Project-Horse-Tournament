@@ -77,6 +77,7 @@ public class HorseMapper {
   }
 
   private BreedDto breedFromMap(Horse horse, Map<Long, BreedDto> map) {
+    LOG.trace("breedFromMap({}, {})", horse, map);
     var breedId = horse.getBreedId();
     if (breedId == null) {
       return null;
