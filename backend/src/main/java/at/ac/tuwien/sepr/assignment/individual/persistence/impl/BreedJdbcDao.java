@@ -19,8 +19,6 @@ import org.springframework.stereotype.Repository;
 public class BreedJdbcDao implements BreedDao {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static final String TABLE_NAME = "breed";
-  private static final String SQL_ALL =
-      "SELECT * FROM " + TABLE_NAME;
   private static final String SQL_FIND_BY_IDS =
       "SELECT * FROM " + TABLE_NAME
           + " WHERE id IN (:ids)";
@@ -36,12 +34,6 @@ public class BreedJdbcDao implements BreedDao {
   }
 
   @Override
-  public Collection<Breed> allBreeds() {
-    LOG.trace("allBreeds()");
-    return jdbcTemplate.query(SQL_ALL, this::mapRow);
-  }
-
-  @Override
   public Collection<Breed> findBreedsById(Set<Long> breedIds) {
     LOG.trace("findBreedsById({})", breedIds);
     return jdbcTemplate.query(SQL_FIND_BY_IDS, Map.of("ids", breedIds), this::mapRow);
@@ -49,6 +41,7 @@ public class BreedJdbcDao implements BreedDao {
 
   @Override
   public Collection<Breed> search(BreedSearchDto searchParams) {
+    LOG.trace("search({})", searchParams);
     String query = SQL_SEARCH;
     if (searchParams.limit() != null) {
       query += SQL_LIMIT_CLAUSE;
@@ -57,6 +50,7 @@ public class BreedJdbcDao implements BreedDao {
   }
 
   private Breed mapRow(ResultSet resultSet, int i) throws SQLException {
+    LOG.trace("mapRow({}, {})", resultSet, i);
     return new Breed()
         .setId(resultSet.getLong("id"))
         .setName(resultSet.getString("name"))
