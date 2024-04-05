@@ -3,12 +3,11 @@ package at.ac.tuwien.sepr.assignment.individual.persistence;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
-import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
 
 import java.util.Collection;
 
 /**
- * Data Access Object for horses.
+ * DAO for horses.
  * Implements access functionality to the application's persistent data store regarding horses.
  */
 public interface HorseDao {
@@ -54,9 +53,14 @@ public interface HorseDao {
    * Delete the horse with the given ID.
    *
    * @param id the ID of the horse to delete
-   * @throws FatalException if the horse with the given ID cannot be deleted
    */
   void delete(long id);
 
+  /**
+   * Get the horses from the persistent data store with the given IDs.
+   *
+   * @param ids the IDs of the horses to get
+   * @return the horses
+   */
   Collection<Horse> getByIds(Collection<Long> ids);
 }
