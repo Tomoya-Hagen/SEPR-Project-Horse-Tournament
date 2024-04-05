@@ -3,7 +3,8 @@ package at.ac.tuwien.sepr.assignment.individual.persistence;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
-import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
+import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
+
 import java.util.Collection;
 
 /**
@@ -30,18 +31,16 @@ public interface HorseDao {
    *
    * @param horse the horse to update
    * @return the updated horse
-   * @throws NotFoundException if the Horse with the given ID does not exist in the persistent data store
    */
-  Horse update(HorseDetailDto horse) throws NotFoundException;
+  Horse update(HorseDetailDto horse);
 
   /**
    * Get a horse by its ID from the persistent data store.
    *
    * @param id the ID of the horse to get
    * @return the horse
-   * @throws NotFoundException if the Horse with the given ID does not exist in the persistent data store
    */
-  Horse getById(long id) throws NotFoundException;
+  Horse getById(long id);
 
   /**
    * Create a horse with the data given.
@@ -55,7 +54,9 @@ public interface HorseDao {
    * Delete the horse with the given ID.
    *
    * @param id the ID of the horse to delete
-   * @throws NotFoundException if the horse with the given ID does not exist
+   * @throws FatalException if the horse with the given ID cannot be deleted
    */
-  void delete(long id) throws NotFoundException;
+  void delete(long id);
+
+  Collection<Horse> getByIds(Collection<Long> ids);
 }

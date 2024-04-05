@@ -91,15 +91,9 @@ public class TournamentJdbcDao implements TournamentDao {
 
 
   @Override
-  public Tournament create(TournamentCreateDto tournament) throws FatalException {
+  public Tournament create(TournamentCreateDto tournament) {
     LOG.trace("create({})", tournament);
-    if (tournament == null) {
-      throw new IllegalArgumentException("tournament must not be null");
-    }
     List<HorseSelectionDto> participants = tournament.participants();
-    if (participants == null || participants.size() != 8) {
-      throw new IllegalArgumentException("horseIDs must not be null and must contain exactly 8 elements");
-    }
 
     int created = jdbcTemplate.update(
         SQL_CREATE,
@@ -109,6 +103,7 @@ public class TournamentJdbcDao implements TournamentDao {
     );
 
     if (created == 0) {
+      LOG.warn("Tournament could not be created");
       throw new FatalException("Tournament could not be created");
     }
 
@@ -128,6 +123,7 @@ public class TournamentJdbcDao implements TournamentDao {
           participantDto.id()
       );
       if (rowAffected == 0) {
+        LOG.warn("Horse could not be associated with tournament");
         throw new FatalException("Horse could not be associated with tournament");
       }
       updateStandings(tournamentID, participantDto.id(), -1, 0);
@@ -150,7 +146,7 @@ public class TournamentJdbcDao implements TournamentDao {
   }
 
   @Override
-  public void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached) throws FatalException {
+  public void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached) {
     LOG.trace("updateStandings({}, {}, {}, {})", tournamentId, horseId, entryNumber, roundReached);
     int updatedRows = jdbcTemplate.update(
         SQL_SET_ENTRY_NUMBER_AND_REACHED_ROUND,
@@ -160,9 +156,9 @@ public class TournamentJdbcDao implements TournamentDao {
         tournamentId
     );
     if (updatedRows != 1) {
-      throw new FatalException("Entry number and round reached could not be set for horse");
+      LOG.warn("Standings could not be updated");
+      throw new FatalException("Standings could not be updated");
     }
-
   }
 
 }

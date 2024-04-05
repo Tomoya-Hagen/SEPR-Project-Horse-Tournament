@@ -4,7 +4,6 @@ import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
-import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.persistence.HorseDao;
 import at.ac.tuwien.sepr.assignment.individual.type.Sex;
 import java.lang.invoke.MethodHandles;
@@ -68,18 +67,10 @@ public class HorseJdbcDao implements HorseDao {
   }
 
   @Override
-  public Horse getById(long id) throws NotFoundException {
+  public Horse getById(long id) {
     LOG.trace("getById({})", id);
     List<Horse> horses;
     horses = jdbcTemplate.query(SQL_SELECT_BY_ID, this::mapRow, id);
-
-    if (horses.isEmpty()) {
-      throw new NotFoundException("No horse with ID %d found".formatted(id));
-    }
-    if (horses.size() > 1) {
-      // This should never happen!!
-      throw new FatalException("Too many horses with ID %d found".formatted(id));
-    }
 
     return horses.get(0);
   }
@@ -93,13 +84,12 @@ public class HorseJdbcDao implements HorseDao {
     }
     var params = new BeanPropertySqlParameterSource(searchParameters);
     params.registerSqlType("sex", Types.VARCHAR);
-
     return jdbcNamed.query(query, params, this::mapRow);
   }
 
 
   @Override
-  public Horse update(HorseDetailDto horse) throws NotFoundException {
+  public Horse update(HorseDetailDto horse) {
     LOG.trace("update({})", horse);
     int updated = jdbcTemplate.update(SQL_UPDATE,
         horse.name(),
@@ -111,7 +101,8 @@ public class HorseJdbcDao implements HorseDao {
         horse.id());
 
     if (updated == 0) {
-      throw new NotFoundException("Could not update horse with ID " + horse.id() + ", because it does not exist");
+      LOG.error("Update of horse failed.");
+      throw new FatalException("Could not update horse with ID " + horse.id());
     }
 
     Horse updatedHorse = new Horse()
@@ -145,8 +136,9 @@ public class HorseJdbcDao implements HorseDao {
 
 
   @Override
-  public Horse create(HorseDetailDto horse) throws FatalException {
+  public Horse create(HorseDetailDto horse) {
     LOG.trace("create({})", horse);
+
     int created = jdbcTemplate.update(SQL_CREATE,
         horse.name(),
         horse.sex().toString(),
@@ -157,6 +149,7 @@ public class HorseJdbcDao implements HorseDao {
         ;
 
     if (created == 0) { //update returns the number of rows updated
+      LOG.error("Creation of horse failed.");
       throw new FatalException("Could not create horse");
     }
 
@@ -177,13 +170,20 @@ public class HorseJdbcDao implements HorseDao {
   }
 
   @Override
-  public void delete(long id) throws NotFoundException {
+  public void delete(long id) {
     LOG.trace("delete({})", id);
     int deleted = jdbcTemplate.update(SQL_DELETE, id);
 
     if (deleted == 0) {
-      throw new NotFoundException("Could not delete horse with ID " + id + ", because it does not exist");
+      LOG.error("Deletion of horse with ID {} failed.", id);
+      throw new FatalException("Could not delete horse with ID " + id);
     }
+  }
+
+  @Override
+  public Collection<Horse> getByIds(Collection<Long> ids) {
+    LOG.trace("getByIds({})", ids);
+    return jdbcTemplate.query(SQL_SELECT_BY_ID, this::mapRow, ids);
   }
 
 }
