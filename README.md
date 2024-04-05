@@ -26,6 +26,7 @@ Vergessen Sie nicht im Projekt ihren Namen und Matrikelnummer zu ersetzen.
 | 30.03. | 17:00 | 5h | 6, 7 | BE, FE, started US7 |
 | 02.04. | 21:30 | 3h | 7 | BE |
 | 03.04. | 09:00 | 6h | 7 | BE, FE |
-| 04.04. | 10:00 | 4h | 7, 9 | BE |
+| 04.04. | 10:00 | 4h | 7, 9 | BE, TS |
+| 05.04. | 19:30 | 3.5h | 9, 10, 25 | BE, TS |
 
-**Gesamtsumme der Zeit**: 65.75h
+**Gesamtsumme der Zeit**: 69.25h
