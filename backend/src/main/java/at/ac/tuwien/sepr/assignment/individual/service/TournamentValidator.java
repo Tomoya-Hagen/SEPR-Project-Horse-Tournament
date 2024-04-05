@@ -39,6 +39,7 @@ public class TournamentValidator {
 
     if (!validationErrors.isEmpty()) {
       String errorMessage = "Validation of tournament for create failed: ";
+      LOG.warn(errorMessage);
       throw new ValidationException(errorMessage, validationErrors);
     }
   }
@@ -61,6 +62,7 @@ public class TournamentValidator {
     }
     if (!validationErrors.isEmpty()) {
       String errorMessage = "Validation of tournament for standings failed: " + validationErrors;
+      LOG.warn(errorMessage);
       throw new ValidationException(errorMessage, validationErrors);
     }
   }

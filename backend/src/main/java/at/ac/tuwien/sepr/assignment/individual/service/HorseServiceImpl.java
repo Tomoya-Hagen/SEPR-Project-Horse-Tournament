@@ -5,9 +5,6 @@ import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
-import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
-import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
-import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepr.assignment.individual.mapper.HorseMapper;
 import at.ac.tuwien.sepr.assignment.individual.persistence.HorseDao;
@@ -39,147 +36,62 @@ public class HorseServiceImpl implements HorseService {
   }
 
   @Override
-  public Stream<HorseListDto> search(HorseSearchDto searchParameters) throws NotFoundException {
+  public Stream<HorseListDto> search(HorseSearchDto searchParameters) {
     LOG.trace("search({})", searchParameters);
-    if (searchParameters == null) {
-      String message = "Search parameters must not be null";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
-    }
-    try {
-      var horses = dao.search(searchParameters);
+    var horses = dao.search(searchParameters);
 
-      var breeds = horses.stream()
-          .map(Horse::getBreedId)
-          .filter(Objects::nonNull)
-          .collect(Collectors.toUnmodifiableSet());
+    var breeds = horses.stream()
+        .map(Horse::getBreedId)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toUnmodifiableSet());
 
-      var breedsPerId = breedMapForHorses(breeds);
+    var breedsPerId = breedMapForHorses(breeds);
 
-      return horses.stream()
-          .map(horse -> mapper.entityToListDto(horse, breedsPerId));
-    } catch (NotFoundException e) {
-      LOG.warn("Horses not found");
-      throw e;
-    }
+    return horses.stream().map(horse -> mapper.entityToListDto(horse, breedsPerId));
   }
 
 
   @Override
-  public HorseDetailDto update(HorseDetailDto horse) throws ValidationException, ConflictException, FatalException, NotFoundException {
+  public HorseDetailDto update(HorseDetailDto horse) throws ValidationException {
     LOG.trace("update({})", horse);
-    if (horse == null) {
-      String message = "Horse must not be null";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
-    }
-    try {
-      validator.validateForUpdate(horse);
-      var updatedHorse = dao.update(horse);
-      var breeds = breedMapForSingleHorse(updatedHorse);
-      return mapper.entityToDetailDto(updatedHorse, breeds);
-    } catch (ValidationException e) {
-      LOG.warn("Horse validation failed");
-      throw e;
-    } catch (FatalException e) {
-      LOG.warn("Horse not found with id: {}", horse.id());
-      throw e;
-    } catch (NotFoundException e) {
-      LOG.warn("No breed found for horse with id: {}", horse.id());
-      throw e;
-    }
+    validator.validateForUpdate(horse);
+    var updatedHorse = dao.update(horse);
+    var breeds = breedMapForSingleHorse(updatedHorse);
+    return mapper.entityToDetailDto(updatedHorse, breeds);
   }
 
 
   @Override
-  public HorseDetailDto getById(long id) throws NotFoundException, FatalException {
+  public HorseDetailDto getById(long id) {
     LOG.trace("getById({})", id);
-    if (id <= 0) {
-      String message = "Id must be greater than zero";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
-    }
-    try {
-      Horse horse = dao.getById(id);
-      var breeds = breedMapForSingleHorse(horse);
-      return mapper.entityToDetailDto(horse, breeds);
-    } catch (NotFoundException e) {
-      LOG.warn("Horse or its breed not found with id: {}", id);
-      throw e;
-    } catch (FatalException e) {
-      LOG.error("There must not be horses with same id: {}", id, e);
-      throw e;
-    }
+    Horse horse = dao.getById(id);
+    var breeds = breedMapForSingleHorse(horse);
+    return mapper.entityToDetailDto(horse, breeds);
   }
 
-  private Map<Long, BreedDto> breedMapForSingleHorse(Horse horse) throws NotFoundException {
+  private Map<Long, BreedDto> breedMapForSingleHorse(Horse horse) {
     LOG.trace("breedsMapForSingleHorse({})", horse);
-    if (horse == null) {
-      String message = "Horse must not be null";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
-    }
-    try {
-      return breedMapForHorses(Collections.singleton(horse.getBreedId()));
-    } catch (NotFoundException e) {
-      LOG.warn("No breed map found for horse with id: {}", horse.getId());
-      throw e;
-    }
+    return breedMapForHorses(Collections.singleton(horse.getBreedId()));
   }
 
-  private Map<Long, BreedDto> breedMapForHorses(Set<Long> horse) throws NotFoundException {
+  private Map<Long, BreedDto> breedMapForHorses(Set<Long> horse) {
     LOG.trace("breeds({})", horse);
-    if (horse == null || horse.isEmpty()) {
-      String message = "Horse must not be null or empty";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
-    }
-    try {
-      return breedService.findBreedsByIds(horse)
-          .collect(Collectors.toUnmodifiableMap(BreedDto::id, Function.identity()));
-    } catch (NotFoundException e) {
-      LOG.warn("No breed map found for horse with ids: {}", horse);
-      throw e;
-    }
+    return breedService.findBreedsByIds(horse)
+        .collect(Collectors.toUnmodifiableMap(BreedDto::id, Function.identity()));
   }
 
   @Override
-  public HorseDetailDto create(HorseDetailDto horse) throws ValidationException, FatalException, NotFoundException {
+  public HorseDetailDto create(HorseDetailDto horse) throws ValidationException {
     LOG.trace("create({})", horse);
-    if (horse == null) {
-      String message = "Horse must not be null";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
-    }
-    try {
-      validator.validateForCreate(horse);
-      Horse createdHorse = dao.create(horse);
-      var breeds = breedMapForSingleHorse(createdHorse);
-      return mapper.entityToDetailDto(createdHorse, breeds);
-    } catch (ValidationException e) {
-      LOG.warn("Horse validation failed");
-      throw e;
-    } catch (FatalException e) {
-      LOG.error("The horse could not be created", e);
-      throw e;
-    } catch (NotFoundException e) {
-      LOG.warn("Horse used to check redundancy of id not found with id: {}", horse.id());
-      throw e;
-    }
+    validator.validateForCreate(horse);
+    Horse createdHorse = dao.create(horse);
+    var breeds = breedMapForSingleHorse(createdHorse);
+    return mapper.entityToDetailDto(createdHorse, breeds);
   }
 
   @Override
-  public void delete(long id) throws FatalException {
+  public void delete(long id) {
     LOG.trace("delete({})", id);
-    if (id <= 0) {
-      LOG.warn("Error occurred while deleting a horse: No horse with id 0 exists");
-      throw new IllegalArgumentException("id must be greater than 0");
-    }
-    try {
-      dao.delete(id);
-    } catch (FatalException e) {
-      LOG.error("Horse with id could not be deleted : {}", id, e);
-      throw e;
-    }
+    dao.delete(id);
   }
 }

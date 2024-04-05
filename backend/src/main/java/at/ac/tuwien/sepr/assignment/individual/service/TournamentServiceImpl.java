@@ -10,8 +10,6 @@ import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsTreeDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
 import at.ac.tuwien.sepr.assignment.individual.entity.Tournament;
-import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
-import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepr.assignment.individual.mapper.HorseMapper;
 import at.ac.tuwien.sepr.assignment.individual.mapper.TournamentMapper;
@@ -51,114 +49,55 @@ public class TournamentServiceImpl implements TournamentService {
   }
 
   @Override
-  public Stream<TournamentListDto> search(TournamentSearchParamsDto searchParameters) throws NotFoundException {
+  public Stream<TournamentListDto> search(TournamentSearchParamsDto searchParameters) {
     LOG.trace("search({})", searchParameters);
-    if (searchParameters == null) {
-      String message = "Search parameters must not be null";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
-    }
-    try {
-      var tournaments = tournamentDao.search(searchParameters);
-      return tournaments.stream()
-          .map(tournamentMapper::entityToListDto);
-    } catch (NotFoundException e) {
-      LOG.warn("Tournament not found");
-      throw e;
-    }
+    var tournaments = tournamentDao.search(searchParameters);
+    return tournaments.stream()
+        .map(tournamentMapper::entityToListDto);
   }
 
   @Override
-  public TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException, NotFoundException, FatalException {
+  public TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException {
     LOG.trace("create({})", tournament);
-    if (tournament == null) {
-      String message = "Tournament must not be null";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
+    validator.validateForCreate(tournament);
+    var createdTournament = tournamentDao.create(tournament);
+    var horseTournaments = horseTournamentDao.getHorsesByIDTournament(createdTournament.getId());
+    List<TournamentDetailParticipantDto> participantDtos = new ArrayList<>();
+    for (HorseSelectionDto participantDto : tournament.participants()) {
+      horseTournaments
+          .stream()
+          .filter(ht -> ht.getHorseId().equals(participantDto.id()))
+          .findFirst().ifPresent(horseTournament -> participantDtos.add(tournamentMapper.entityToTournamentDetailParticipantDto(participantDto,
+              horseTournament.getEntryNumber(), horseTournament.getRoundReached())));
     }
-    try {
-      validator.validateForCreate(tournament);
-      var createdTournament = tournamentDao.create(tournament);
-      var horseTournaments = horseTournamentDao.getHorsesByIDTournament(createdTournament.getId());
-      List<TournamentDetailParticipantDto> participantDtos = new ArrayList<>();
-      for (HorseSelectionDto participantDto : tournament.participants()) {
-        HorseTournament horseTournament = horseTournaments
-            .stream()
-            .filter(ht -> ht.getHorseId().equals(participantDto.id()))
-            .findFirst()
-            .orElse(null);
-        if (horseTournament == null) {
-          String message = "Horse with id " + participantDto.id() + " does not exist";
-          LOG.warn(message);
-          throw new NotFoundException(message);
-        }
-        participantDtos.add(tournamentMapper.entityToTournamentDetailParticipantDto(participantDto,
-            horseTournament.getEntryNumber(), horseTournament.getRoundReached()));
-      }
-      return tournamentMapper.entityToDetailDto(createdTournament, participantDtos);
-    } catch (ValidationException e) {
-      LOG.warn("Validation of the tournament failed");
-      throw e;
-    } catch (NotFoundException e) {
-      LOG.warn("Horse not found");
-      throw e;
-    } catch (FatalException e) {
-      LOG.error("Tournament could not be created or horses could not be associated with tournament", e);
-      throw e;
-    }
+    return tournamentMapper.entityToDetailDto(createdTournament, participantDtos);
   }
 
   @Override
-  public TournamentStandingsDto getStandingsByTournamentId(Long tournamentId) throws NotFoundException {
+  public TournamentStandingsDto getStandingsByTournamentId(Long tournamentId) {
     LOG.trace("getStandingsByTournamentId({})", tournamentId);
     Tournament tournament = tournamentDao.getById(tournamentId);
-    if (tournamentId == null || tournament == null) {
-      String message = "tournament and its id must not be null";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
+    Collection<HorseTournament> horseTournaments = horseTournamentDao.getHorsesByIDTournament(tournamentId);
+    Map<Long, HorseSelectionDto> horseMap = new HashMap<>();
+    for (HorseTournament horseTournament : horseTournaments) {
+      horseMap.put(horseTournament.getHorseId(), horseMapper.entityToSelectionDto(horseDao.getById(horseTournament.getHorseId())));
     }
-    try {
-      Collection<HorseTournament> horseTournaments = horseTournamentDao.getHorsesByIDTournament(tournamentId);
-      Map<Long, HorseSelectionDto> horseMap = new HashMap<>();
-      for (HorseTournament horseTournament : horseTournaments) {
-        horseMap.put(horseTournament.getHorseId(), horseMapper.entityToSelectionDto(horseDao.getById(horseTournament.getHorseId())));
-      }
-      return tournamentMapper.entityToTournamentStandingsDto(tournament, horseTournaments, horseMap);
-    } catch (NotFoundException e) {
-      LOG.warn(e.getMessage());
-      throw e;
-    }
+    return tournamentMapper.entityToTournamentStandingsDto(tournament, horseTournaments, horseMap);
   }
 
   @Override
-  public TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws NotFoundException, ValidationException, FatalException {
+  public TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException {
     LOG.trace("updateStandings({})", standings);
-    if (standings == null || standings.participants() == null || standings.participants().isEmpty()) {
-      String message = "Standings does not exist or is invalid";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
+    validator.validateForStandings(standings);
+    List<HorseTournament> horseTournaments = new ArrayList<>();
+    for (TournamentDetailParticipantDto horse : standings.participants()) {
+      horseTournaments.add(tournamentMapper.tournamentDetailParticipantDtoToHorseTournament(horse, standings.id()));
     }
-    try {
-      validator.validateForStandings(standings);
-      List<HorseTournament> horseTournaments = new ArrayList<>();
-      for (TournamentDetailParticipantDto horse : standings.participants()) {
-        horseTournaments.add(tournamentMapper.tournamentDetailParticipantDtoToHorseTournament(horse, standings.id()));
-      }
-      fillTree(standings.tree(), horseTournaments, 1);
-      for (HorseTournament horse : horseTournaments) {
-        tournamentDao.updateStandings(horse.getTournamentId(), horse.getHorseId(), horse.getEntryNumber(), horse.getRoundReached());
-      }
-      return getStandingsByTournamentId(standings.id());
-    } catch (ValidationException e) {
-      LOG.warn("Validation of the standings failed");
-      throw e;
-    } catch (FatalException e) {
-      LOG.error("Standings could not be updated", e);
-      throw new FatalException("Standings could not be updated", e);
-    } catch (NotFoundException e) {
-      LOG.warn(e.getMessage());
-      throw e;
+    fillTree(standings.tree(), horseTournaments, 1);
+    for (HorseTournament horse : horseTournaments) {
+      tournamentDao.updateStandings(horse.getTournamentId(), horse.getHorseId(), horse.getEntryNumber(), horse.getRoundReached());
     }
+    return getStandingsByTournamentId(standings.id());
   }
 
   @Override

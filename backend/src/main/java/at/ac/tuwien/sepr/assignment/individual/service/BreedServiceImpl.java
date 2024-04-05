@@ -2,7 +2,6 @@ package at.ac.tuwien.sepr.assignment.individual.service;
 
 import at.ac.tuwien.sepr.assignment.individual.dto.BreedDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.BreedSearchDto;
-import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.mapper.BreedMapper;
 import at.ac.tuwien.sepr.assignment.individual.persistence.BreedDao;
 import java.lang.invoke.MethodHandles;
@@ -23,47 +22,20 @@ public class BreedServiceImpl implements BreedService {
     this.mapper = mapper;
   }
 
-  @Override
-  public Stream<BreedDto> allBreeds() throws NotFoundException {
-    LOG.trace("allBreeds()");
-    try {
-      return dao.allBreeds()
-          .stream()
-          .map(mapper::entityToDto);
-    } catch (NotFoundException e) {
-      LOG.warn("Could not find any breeds");
-      throw e;
-    }
-  }
 
   @Override
-  public Stream<BreedDto> findBreedsByIds(Set<Long> breedIds) throws NotFoundException {
+  public Stream<BreedDto> findBreedsByIds(Set<Long> breedIds) {
     LOG.trace("findBreedsByIds({})", breedIds);
-    if (breedIds == null || breedIds.isEmpty()) {
-      String message = "breedIds must not be null or empty";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
-    }
     return dao.findBreedsById(breedIds)
         .stream()
         .map(mapper::entityToDto);
   }
 
   @Override
-  public Stream<BreedDto> search(BreedSearchDto searchParams) throws NotFoundException {
+  public Stream<BreedDto> search(BreedSearchDto searchParams) {
     LOG.trace("search({})", searchParams);
-    if (searchParams == null) {
-      String message = "Search parameters must not be null";
-      LOG.warn(message);
-      throw new IllegalArgumentException(message);
-    }
-    try {
-      return dao.search(searchParams)
-          .stream()
-          .map(mapper::entityToDto);
-    } catch (NotFoundException e) {
-      LOG.warn("Breed not found with the given search parameters");
-      throw e;
-    }
+    return dao.search(searchParams)
+        .stream()
+        .map(mapper::entityToDto);
   }
 }

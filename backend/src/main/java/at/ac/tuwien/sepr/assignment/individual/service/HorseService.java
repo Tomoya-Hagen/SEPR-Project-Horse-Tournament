@@ -3,8 +3,6 @@ package at.ac.tuwien.sepr.assignment.individual.service;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
-import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
-import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import java.util.stream.Stream;
 
@@ -19,7 +17,7 @@ public interface HorseService {
    * @param searchParameters the search parameters to use in filtering.
    * @return the horses where the given fields match.
    */
-  Stream<HorseListDto> search(HorseSearchDto searchParameters) throws NotFoundException;
+  Stream<HorseListDto> search(HorseSearchDto searchParameters);
 
   /**
    * Updates the horse with the ID given in {@code horse}
@@ -28,11 +26,9 @@ public interface HorseService {
    *
    * @param horse the horse to update
    * @return he updated horse
-   * @throws NotFoundException if the horse with given ID does not exist in the persistent data store
-   * @throws ValidationException if the update data given for the horse is in itself incorrect (no name, name too long …)
-   * @throws ConflictException if the update data given for the horse is in conflict the data currently in the system (breed does not exist, …)
+   * @throws ValidationException if the update data given for the horse is in itself incorrect (no name …)
    */
-  HorseDetailDto update(HorseDetailDto horse) throws NotFoundException, ValidationException, ConflictException;
+  HorseDetailDto update(HorseDetailDto horse) throws ValidationException;
 
 
   /**
@@ -41,9 +37,8 @@ public interface HorseService {
    *
    * @param id the ID of the horse to get
    * @return the horse with ID {@code id}
-   * @throws NotFoundException if the horse with the given ID does not exist in the persistent data store
    */
-  HorseDetailDto getById(long id) throws NotFoundException;
+  HorseDetailDto getById(long id);
 
   /**
    * Create a horse with the data given.
@@ -52,13 +47,12 @@ public interface HorseService {
    * @return the created horse
    * @throws ValidationException if the data given for the horse is in itself incorrect
    */
-  HorseDetailDto create(HorseDetailDto horse) throws ValidationException, NotFoundException;
+  HorseDetailDto create(HorseDetailDto horse) throws ValidationException;
 
   /**
    * Delete the horse with the given ID.
    *
    * @param id the ID of the horse to delete
-   * @throws NotFoundException if the horse with the given ID does not exist
    */
-  void delete(long id) throws NotFoundException;
+  void delete(long id);
 }

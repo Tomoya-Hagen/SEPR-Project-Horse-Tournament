@@ -7,7 +7,6 @@ import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsTreeDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
-import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public interface TournamentService {
    * @param searchParams the search parameters to use in filtering.
    * @return the tournaments where the given fields match.
    */
-  Stream<TournamentListDto> search(TournamentSearchParamsDto searchParams) throws NotFoundException;
+  Stream<TournamentListDto> search(TournamentSearchParamsDto searchParams);
 
   /**
    * Create a tournament with the data given.
@@ -32,13 +31,12 @@ public interface TournamentService {
    * @param tournament the tournament to create
    * @return the created tournament
    * @throws ValidationException if the data given for the tournament is in itself incorrect
-   * @throws NotFoundException if a horse with the given id does not exist
    */
-  TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException, NotFoundException;
+  TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException;
 
-  TournamentStandingsDto getStandingsByTournamentId(Long tournamentId) throws NotFoundException;
+  TournamentStandingsDto getStandingsByTournamentId(Long tournamentId);
 
-  TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws NotFoundException, ValidationException;
+  TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException;
 
   int fillTree(TournamentStandingsTreeDto standings, List<HorseTournament> horseTournaments, int entryNumber);
 }
