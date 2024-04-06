@@ -95,7 +95,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
     fillTree(standings.tree(), horseTournaments, 1);
     for (HorseTournament horse : horseTournaments) {
-      tournamentDao.updateStandings(horse.getTournamentId(), horse.getHorseId(), horse.getEntryNumber(), horse.getRoundReached());
+      horseTournamentDao.updateStandings(horse.getTournamentId(), horse.getHorseId(), horse.getEntryNumber(), horse.getRoundReached());
     }
     return getStandingsByTournamentId(standings.id());
   }

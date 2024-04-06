@@ -57,17 +57,17 @@ public class TournamentJdbcDao implements TournamentDao {
 
   private static final String SQL_ASSOCIATE_HORSE_WITH_TOURNAMENT =
       "INSERT INTO " + " tournament_horses " + " (tournament_id, horse_id) VALUES (?, ?)";
-  private static final String SQL_SET_ENTRY_NUMBER_AND_REACHED_ROUND = "UPDATE "
-      + " tournament_horses " + " SET entry_number = ?, round_reached = ? WHERE horse_id = ? AND tournament_id = ?";
 
   private final JdbcTemplate jdbcTemplate;
   private final NamedParameterJdbcTemplate jdbcNamed;
+  private HorseTournamentJdbcDao horseTournamentJdbcDao;
 
   public TournamentJdbcDao(
       JdbcTemplate jdbcTemplate,
-      NamedParameterJdbcTemplate jdbcNamed) {
+      NamedParameterJdbcTemplate jdbcNamed, HorseTournamentJdbcDao horseTournamentJdbcDao) {
     this.jdbcTemplate = jdbcTemplate;
     this.jdbcNamed = jdbcNamed;
+    this.horseTournamentJdbcDao = horseTournamentJdbcDao;
   }
 
 
@@ -126,7 +126,7 @@ public class TournamentJdbcDao implements TournamentDao {
         LOG.warn("Horse could not be associated with tournament");
         throw new FatalException("Horse could not be associated with tournament");
       }
-      updateStandings(tournamentID, participantDto.id(), -1, 0);
+      horseTournamentJdbcDao.updateStandings(tournamentID, participantDto.id(), -1, 0);
     }
 
     return new Tournament()
@@ -143,22 +143,6 @@ public class TournamentJdbcDao implements TournamentDao {
   public Tournament getById(Long tournamentId) {
     LOG.trace("getById({})", tournamentId);
     return jdbcTemplate.query(SQL_SEARCH_TOURNAMENT_BY_ID, this::mapRow, tournamentId).get(0);
-  }
-
-  @Override
-  public void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached) {
-    LOG.trace("updateStandings({}, {}, {}, {})", tournamentId, horseId, entryNumber, roundReached);
-    int updatedRows = jdbcTemplate.update(
-        SQL_SET_ENTRY_NUMBER_AND_REACHED_ROUND,
-        entryNumber,
-        roundReached,
-        horseId,
-        tournamentId
-    );
-    if (updatedRows != 1) {
-      LOG.warn("Standings could not be updated");
-      throw new FatalException("Standings could not be updated");
-    }
   }
 
 }

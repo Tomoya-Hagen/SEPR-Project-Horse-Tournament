@@ -40,13 +40,4 @@ public interface TournamentDao {
    */
   Tournament getById(Long tournamentId);
 
-  /**
-   * Update the tournament with the given data.
-   *
-   * @param tournamentId the id of the tournament to update
-   * @param horseId the id of the horse to update
-   * @param entryNumber the entry number of the horse to update
-   * @param roundReached the number of the round reached by the horse to update
-   */
-  void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached);
 }
