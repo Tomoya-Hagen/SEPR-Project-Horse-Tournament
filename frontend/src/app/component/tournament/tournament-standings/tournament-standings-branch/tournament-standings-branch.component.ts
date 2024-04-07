@@ -18,6 +18,7 @@ export class TournamentStandingsBranchComponent {
   @Input() branchPosition = TournamentBranchPosition.FINAL_WINNER;
   @Input() treeBranch: TournamentStandingsTreeDto | undefined;
   @Input() allParticipants: TournamentDetailParticipantDto[] = [];
+  @Input() disabled = false;
 
   get isUpperHalf(): boolean {
     return this.branchPosition === TournamentBranchPosition.UPPER;
@@ -29,6 +30,10 @@ export class TournamentStandingsBranchComponent {
 
   get isFinalWinner(): boolean {
     return this.branchPosition === TournamentBranchPosition.FINAL_WINNER;
+  }
+
+  getDisabled() : boolean {
+    return this.disabled;
   }
 
   suggestions = (input: string) => {
@@ -50,4 +55,22 @@ export class TournamentStandingsBranchComponent {
         ? `${participant.name} (${participant.dateOfBirth})`
         : "";
   }
+
+  isMatchIncomplete(branch : TournamentStandingsTreeDto | undefined): boolean {
+    if (!branch || !branch.branches) {
+      return false;
+    }
+    for (const child of branch.branches) {
+      if (child && !child.thisParticipant) {
+        return true; // If any child match is incomplete, return true
+      }
+    }
+
+    return false; // All child matches are complete
+  }
+
+  isWinnerSet(branch : TournamentStandingsTreeDto | undefined): boolean {
+    return branch?.thisParticipant ? true : false;
+  }
+
 }
