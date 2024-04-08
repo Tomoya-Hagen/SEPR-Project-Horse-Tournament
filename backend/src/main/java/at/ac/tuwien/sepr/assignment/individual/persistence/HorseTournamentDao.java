@@ -3,6 +3,9 @@ package at.ac.tuwien.sepr.assignment.individual.persistence;
 import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO for working with horses in a tournament.
@@ -28,5 +31,12 @@ public interface HorseTournamentDao {
    */
   void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached);
 
+  /**
+  * Get the horses of the tournaments with the given ids.
+  *
+  * @param tournamentIds the ids of the tournament to get the standings for.
+  * @return a mapping of tournamentIds and the corresponding horses participating in the tournaments.
+  */
+  Map<Long, List<HorseTournament>> getHorsesByIDsTournaments(Set<Long> tournamentIds);
 
 }

@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.assignment.individual.dto.TournamentCreateDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Tournament;
 import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
+import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.persistence.TournamentDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import java.lang.invoke.MethodHandles;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -57,6 +59,11 @@ public class TournamentJdbcDao implements TournamentDao {
 
   private static final String SQL_ASSOCIATE_HORSE_WITH_TOURNAMENT =
       "INSERT INTO " + " tournament_horses " + " (tournament_id, horse_id) VALUES (?, ?)";
+
+  private static final String SQL_FIND_LAST_12_MONTHS = "SELECT *"
+      + " FROM " + TABLE_NAME
+      + " WHERE end_date BETWEEN ? AND ?";
+
 
   private final JdbcTemplate jdbcTemplate;
   private final NamedParameterJdbcTemplate jdbcNamed;
@@ -143,6 +150,20 @@ public class TournamentJdbcDao implements TournamentDao {
   public Tournament getById(Long tournamentId) {
     LOG.trace("getById({})", tournamentId);
     return jdbcTemplate.query(SQL_SEARCH_TOURNAMENT_BY_ID, this::mapRow, tournamentId).get(0);
+  }
+
+  @Override
+  public List<Tournament> getLast12MonthsTournaments(LocalDate startDate) throws NotFoundException {
+    LOG.trace("getLast12MonthsTournamentStandings()");
+    LocalDate endDate = startDate.minusMonths(12);
+    startDate = startDate.minusDays(1); //exclude the start date
+    List<Tournament> results = jdbcTemplate.query(SQL_FIND_LAST_12_MONTHS, this::mapRow, endDate, startDate);
+    if (results.isEmpty()) {
+      LOG.warn("Tournaments could not be found");
+      throw new NotFoundException("Tournaments could not be found");
+    } else {
+      return results;
+    }
   }
 
 }

@@ -56,7 +56,7 @@ public class TournamentEndpoint {
     }
   }
 
-  private void logClientError(HttpStatus status, String message, ValidationException e) {
+  private void logClientError(HttpStatus status, String message, Exception e) {
     LOG.warn("{} {}: {}: {}", status.value(), message, e.getClass().getSimpleName(), e.getMessage());
   }
 
@@ -69,16 +69,31 @@ public class TournamentEndpoint {
 
   @PatchMapping("standings/{id}")
   public ResponseEntity<TournamentStandingsDto> updateStandings(@PathVariable("id") Long tournamentId,
-                                                                @RequestBody TournamentStandingsDto standings) {
+                                                                @RequestBody TournamentStandingsDto standings) throws ValidationException {
     LOG.info("PATCH " + BASE_PATH + "/standings" + "/{}", tournamentId);
     LOG.debug("request parameters: {}", tournamentId);
     try {
       return ResponseEntity.ok(service.updateStandings(standings));
     } catch (ValidationException e) {
-      HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+      HttpStatus status =  HttpStatus.UNPROCESSABLE_ENTITY;
       logClientError(status, "Standings could not be updated", e);
       throw new ResponseStatusException(status, e.getMessage(), e);
     }
   }
+
+  @PatchMapping("standings/{id}/first")
+  public ResponseEntity<TournamentStandingsDto> generateFirstRound(@PathVariable("id") Long tournamentId,
+                                                                   @RequestBody TournamentStandingsDto standings) throws NotFoundException {
+    LOG.info("PATCH " + BASE_PATH + "/standings" + "/{}/first", tournamentId);
+    LOG.debug("request parameters: {}", tournamentId);
+    try {
+      return ResponseEntity.ok(service.generateFirstRound(standings));
+    } catch (NotFoundException e) {
+      HttpStatus status =  HttpStatus.NOT_FOUND;
+      logClientError(status, "Standings could not be updated", e);
+      throw new ResponseStatusException(status, e.getMessage(), e);
+    }
+  }
+
 
 }

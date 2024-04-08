@@ -12,6 +12,10 @@ import java.lang.invoke.MethodHandles;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Repository
 public class HorseTournamentJdbcDao implements HorseTournamentDao {
@@ -47,6 +51,18 @@ public class HorseTournamentJdbcDao implements HorseTournamentDao {
   public Collection<HorseTournament> getHorsesByIDTournament(Long tournamentId) {
     LOG.trace("getHorseByIDTournaments({})", tournamentId);
     return jdbcTemplate.query(SQL_SEARCH_HORSE_BY_ID_TOURNAMENTS, this::mapHorseRow, tournamentId);
+  }
+
+  @Override
+  public Map<Long, List<HorseTournament>> getHorsesByIDsTournaments(Set<Long> tournamentIds) {
+    LOG.trace("getHorseByIDTournaments({})", tournamentIds);
+    Map<Long, List<HorseTournament>> results = new HashMap<>();
+    for (Long tournamentId : tournamentIds) {
+      List<HorseTournament> horses = jdbcTemplate.query(SQL_SEARCH_HORSE_BY_ID_TOURNAMENTS, this::mapHorseRow, tournamentId);
+      results.put(tournamentId, horses);
+    }
+
+    return results;
   }
 
   @Override

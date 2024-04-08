@@ -3,8 +3,11 @@ package at.ac.tuwien.sepr.assignment.individual.persistence;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentCreateDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Tournament;
+import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * DAO for tournaments.
@@ -40,4 +43,12 @@ public interface TournamentDao {
    */
   Tournament getById(Long tournamentId);
 
+  /**
+   * Get the tournaments of the last 12 months.
+   *
+   * @param startDate this tournament's start date
+   * @return the tournaments of the last 12 months
+   * @throws NotFoundException if no tournaments could be found
+   */
+  List<Tournament> getLast12MonthsTournaments(LocalDate startDate) throws NotFoundException;
 }

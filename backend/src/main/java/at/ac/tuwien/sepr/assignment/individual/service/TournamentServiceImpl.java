@@ -8,8 +8,10 @@ import at.ac.tuwien.sepr.assignment.individual.dto.TournamentListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsTreeDto;
+import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
 import at.ac.tuwien.sepr.assignment.individual.entity.Tournament;
+import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepr.assignment.individual.mapper.HorseMapper;
 import at.ac.tuwien.sepr.assignment.individual.mapper.TournamentMapper;
@@ -21,11 +23,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -125,5 +130,103 @@ public class TournamentServiceImpl implements TournamentService {
     return entryNumber;
   }
 
+  @Override
+  public List<TournamentDetailParticipantDto> calculatePointsForHorses(Long tournamentId) throws NotFoundException {
+    LOG.trace("calculatePointsForHorses({})", tournamentId);
+    Tournament tournament = tournamentDao.getById(tournamentId);
+    LocalDate startDate = tournament.getStartDate();
+    Collection<HorseTournament> horses = horseTournamentDao.getHorsesByIDTournament(tournamentId);
 
+
+    List<Tournament> tournaments = tournamentDao.getLast12MonthsTournaments(startDate);
+    Set<Long> tournamentIds = tournaments.stream().map(Tournament::getId).collect(Collectors.toSet());
+    Map<Long, List<HorseTournament>> map = horseTournamentDao.getHorsesByIDsTournaments(tournamentIds); //tournamentId, horseTournaments
+
+
+    Map<Long, Integer> points = new HashMap<>(); //horseId, points
+
+    for (Tournament t : tournaments) {
+      Long currentTournamentId = t.getId();
+      List<HorseTournament> horseTournaments = map.get(currentTournamentId);
+
+      for (HorseTournament horse : horses) { //you need to check the horse's points from the past tournaments
+        int tournamentPoints = points.getOrDefault(horse.getHorseId(), 0);
+        if (containsHorse(horse, horseTournaments)) {
+          HorseTournament wanted = new HorseTournament(null, null, 0, 0);
+          for (HorseTournament horseTournament : horseTournaments) {
+            if (horseTournament.getHorseId().equals(horse.getHorseId())) {
+              wanted = horseTournament;
+              break;
+            }
+          }
+          if (wanted.getRoundReached() == 4) {
+            tournamentPoints += 5;
+          }
+          if (wanted.getRoundReached() == 3) {
+            tournamentPoints += 3;
+          }
+          if (wanted.getRoundReached() == 2) {
+            tournamentPoints += 1;
+          }
+        }
+        points.put(horse.getHorseId(), tournamentPoints);
+      }
+    }
+
+    List<Map.Entry<Long, Integer>> list = new ArrayList<>(points.entrySet());
+    list.sort((entry1, entry2) -> {
+      int compareByValue = entry1.getValue().compareTo(entry2.getValue());
+
+      if (compareByValue == 0) {
+        return horseDao.getById(entry1.getKey()).getName().compareTo(horseDao.getById(entry2.getKey()).getName());
+      } else {
+        return compareByValue;
+      }
+    });
+
+
+    List<Horse> participants = new ArrayList<>();
+    participants.add(horseDao.getById(list.get(7).getKey())); //1
+    participants.add(horseDao.getById(list.get(0).getKey())); //2
+    participants.add(horseDao.getById(list.get(6).getKey())); //3
+    participants.add(horseDao.getById(list.get(1).getKey()));
+    participants.add(horseDao.getById(list.get(5).getKey()));
+    participants.add(horseDao.getById(list.get(2).getKey()));
+    participants.add(horseDao.getById(list.get(4).getKey()));
+    participants.add(horseDao.getById(list.get(3).getKey()));
+
+    List<TournamentDetailParticipantDto> participantDtos = new ArrayList<>();
+
+    for (int i = 0; i < 8; i++) {
+      participantDtos.add(new TournamentDetailParticipantDto(participants.get(i).getId(), participants.get(i).getName(), participants.get(i).getDateOfBirth(),
+          i + 1, 1));
+    }
+
+    for (HorseTournament horse : horses) {
+      TournamentDetailParticipantDto current = participantDtos.stream().filter(p -> p.horseId().equals(horse.getHorseId())).findFirst().get();
+      horseTournamentDao.updateStandings(tournamentId, current.horseId(), current.entryNumber(), current.roundReached());
+    }
+
+    return participantDtos;
+  }
+
+  @Override
+  public TournamentStandingsDto generateFirstRound(TournamentStandingsDto standings) throws NotFoundException {
+    LOG.trace("generateFirstRound({})", standings);
+
+    Long tournamentId = standings.id();
+    calculatePointsForHorses(tournamentId);
+
+    return getStandingsByTournamentId(standings.id());
+  }
+
+  private boolean containsHorse(HorseTournament horseTournament, List<HorseTournament> horseTournaments) {
+    LOG.trace("containsHorse({}, {})", horseTournament, horseTournaments);
+    for (HorseTournament ht : horseTournaments) {
+      if (ht.getHorseId().equals(horseTournament.getHorseId())) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

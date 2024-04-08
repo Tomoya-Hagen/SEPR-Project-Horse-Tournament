@@ -2,11 +2,13 @@ package at.ac.tuwien.sepr.assignment.individual.service;
 
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentCreateDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentDetailDto;
+import at.ac.tuwien.sepr.assignment.individual.dto.TournamentDetailParticipantDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsTreeDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
+import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 
 import java.util.List;
@@ -60,4 +62,23 @@ public interface TournamentService {
    * @return the last entry number after filling the tree.
    */
   int fillTree(TournamentStandingsTreeDto standings, List<HorseTournament> horseTournaments, int entryNumber);
+
+  /**
+   * Get the horses of the tournaments with the given ids.
+   *
+   * @param tournamentId the id of the tournament to get the standings for.
+   * @return the horses participating in the tournaments
+   * @throws NotFoundException if the tournament with the given id or the tournaments from the past 12months could not be found.
+   */
+  List<TournamentDetailParticipantDto> calculatePointsForHorses(Long tournamentId) throws NotFoundException;
+
+  /**
+   * Generate the first round of the standings.
+   *
+   * @param standings the standings to generate the first round of.
+   * @return the standings after the first round has been generated.
+   * @throws NotFoundException if the tournament with the given id or the tournaments from the past 12months could not be found.
+   */
+  TournamentStandingsDto generateFirstRound(TournamentStandingsDto standings) throws NotFoundException;
+
 }
