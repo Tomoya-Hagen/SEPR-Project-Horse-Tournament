@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {map, Observable, throwError} from 'rxjs';
+import {catchError, Observable, throwError} from 'rxjs';
 import {formatIsoDate} from '../util/date-helper';
 import {
   TournamentCreateDto, TournamentDetailDto, TournamentDetailParticipantDto,
@@ -79,13 +79,28 @@ export class TournamentService {
     return this.http.get<TournamentStandingsDto>(`${baseUri}/standings/${id}`);
   }
 
-  public saveStandings(tournamentStanding: TournamentStandingsDto): Observable<TournamentStandingsDto> {
-    if(!tournamentStanding) {
+  public saveStandings(tournamentStandings: TournamentStandingsDto): Observable<TournamentStandingsDto> {
+    if(!tournamentStandings) {
       return throwError(() => new ErrorDto("No tournament standing provided"));
     }
     return this.http.patch<TournamentStandingsDto>(
-      `${baseUri}/standings/${tournamentStanding.id}`,
-      tournamentStanding
+      `${baseUri}/standings/${tournamentStandings.id}`,
+      tournamentStandings
+    )
+  }
+
+  public generateFirstRound(tournamentStandings: TournamentStandingsDto): Observable<TournamentStandingsDto> {
+    if(!tournamentStandings) {
+      return throwError(() => new ErrorDto("No tournament id provided"));
+    }
+    return this.http.patch<TournamentStandingsDto>(
+      `${baseUri}/standings/${tournamentStandings.id}/first`,
+      tournamentStandings
+    ).pipe(
+      catchError((error) => {
+        console.error('Error generating first round:', error);
+        throw error;
+      })
     )
   }
 

@@ -4,6 +4,7 @@ import {TournamentService} from "../../../service/tournament.service";
 import {ActivatedRoute} from "@angular/router";
 import {NgForm} from "@angular/forms";
 import {Location} from "@angular/common";
+import {throwError} from 'rxjs';
 import {ToastrService} from "ngx-toastr";
 import {ErrorFormatterService} from "../../../service/error-formatter.service";
 
@@ -41,9 +42,9 @@ export class TournamentStandingsComponent implements OnInit {
   }
 
   public submit(form: NgForm) {
-    if (form.invalid)
+    if (form.invalid) {
       return;
-    else
+    } else {
       this.service.saveStandings(this.standings!)
         .subscribe({
           next: data => {
@@ -58,11 +59,26 @@ export class TournamentStandingsComponent implements OnInit {
             });
           }
         });
+    }
   }
 
   public generateFirstRound() {
-    if (!this.standings)
+    if (!this.standings) {
       return;
-    // TODO implement
+    }
+    this.service.generateFirstRound(this.standings)
+      .subscribe({
+        next: data => {
+          this.standings = data;
+          this.notification.success(`First round generated`, "First round generated successfully");
+        },
+        error: error => {
+          console.error(error.message, error);
+          this.notification.error(this.errorFormatter.format(error), "Could Not Generate First Round", {
+            enableHtml: true,
+            timeOut: 10000,
+          });
+        }
+      });
   }
 }
