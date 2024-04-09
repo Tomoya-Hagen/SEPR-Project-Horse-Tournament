@@ -4,7 +4,6 @@ import {TournamentService} from "../../../service/tournament.service";
 import {ActivatedRoute} from "@angular/router";
 import {NgForm} from "@angular/forms";
 import {Location} from "@angular/common";
-import {throwError} from 'rxjs';
 import {ToastrService} from "ngx-toastr";
 import {ErrorFormatterService} from "../../../service/error-formatter.service";
 
@@ -65,6 +64,13 @@ export class TournamentStandingsComponent implements OnInit {
   public generateFirstRound() {
     if (!this.standings) {
       return;
+    }
+    for (const participant of this.standings.participants) {
+      if (participant.roundReached !== 0) {
+        console.error("Cannot generate first round: there are already entries of rounds");
+        this.notification.error("Cannot generate first round: there are already entries of rounds", "Cannot Generate First Round");
+        return;
+      }
     }
     this.service.generateFirstRound(this.standings)
       .subscribe({
