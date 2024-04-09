@@ -135,12 +135,12 @@
                aria-label="Edit horse">
               <i class="bi bi-pencil"></i>
             </a>
-            <button class="btn btn-sm responsive-danger-button"
-               (click)="deleteHorse(horse)"
-               aria-label="Delete horse">
+            <button type="button" class="btn btn-sm responsive-danger-button"
+                    data-bs-toggle="modal" [attr.data-bs-target]="'#confirm-delete-dialog-' + horse.id">
               <i class="bi bi-trash"></i>
             </button>
           </div>
+          <app-confirm-delete-dialog [deleteWhat]="horse.name" (confirm)="deleteHorse(horse)" [id]="'confirm-delete-dialog-' + horse.id"></app-confirm-delete-dialog>
         </td>
       </tr>
     </tbody>
