@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -115,14 +116,25 @@ public class TournamentMapper {
           horse.dateOfBirth())), horseTournament.getEntryNumber(), horseTournament.getRoundReached()));
     }
     TournamentStandingsTreeDto root = generateTree(null, 1);
-    List<TournamentDetailParticipantDto> participantsSortedByEntryNumber = new ArrayList<>(participants);
-    participantsSortedByEntryNumber.sort(Comparator.comparingInt(TournamentDetailParticipantDto::entryNumber));
-    root = fillStandingsTree(root, participantsSortedByEntryNumber, 4);
+    List<TournamentDetailParticipantDto> participantsList = new ArrayList<>(participants);
+    TournamentDetailParticipantDto[] sortedParticipants = new TournamentDetailParticipantDto[participantsList.size()];
+    for (int i = 0; i < 8; i++) {
+      int j = i + 1;
+      sortedParticipants[i] = participants.stream().filter(p -> p.entryNumber() == j).findFirst().orElse(null);
+      participants.remove(sortedParticipants[i]);
+    }
+    for (int i = 0; i < 8; i++) {
+      if (sortedParticipants[i] == null) {
+        sortedParticipants[i] = participants.get(0);
+        participants.remove(0);
+      }
+    }
+    root = fillStandingsTree(root, Arrays.stream(sortedParticipants).toList(), 4);
 
     return new TournamentStandingsDto(
         tournament.getId(),
         tournament.getName(),
-        participants,
+        participantsList,
         root
     );
   }
