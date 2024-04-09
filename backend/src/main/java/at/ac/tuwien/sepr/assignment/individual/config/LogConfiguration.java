@@ -7,6 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * Configuration class for logging within the application.
+ * This class defines a filter bean to log incoming requests.
+ */
 @Configuration
 public class LogConfiguration {
 

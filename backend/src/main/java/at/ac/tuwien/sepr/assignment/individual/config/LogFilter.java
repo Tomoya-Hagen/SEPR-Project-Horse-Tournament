@@ -32,6 +32,15 @@ public class LogFilter extends OncePerRequestFilter {
   );
 
 
+  /**
+   * Executes the filtering logic for incoming requests.
+   * Logs request details and measures the time taken for request processing.
+   *
+   * @param request     HttpServletRequest object representing the incoming request.
+   * @param response    HttpServletResponse object representing the outgoing response.
+   * @param filterChain FilterChain object for invoking the next filter in the chain.
+   * @throws FatalException if the processing of the request results in a ServletException or IOException.
+   */
   @Override
   public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
     var runtime = -1L;
