@@ -72,7 +72,7 @@ public class HorseMapper {
    * Convert a horse entity object to a {@link HorseSelectionDto}.
    *
    * @param horse the horse to convert
-   * @return the converted {@link HorseSelection}
+   * @return the converted {@link HorseSelectionDto}
    */
   public HorseSelectionDto entityToSelectionDto(Horse horse) {
     LOG.trace("entityToDto({})", horse);
