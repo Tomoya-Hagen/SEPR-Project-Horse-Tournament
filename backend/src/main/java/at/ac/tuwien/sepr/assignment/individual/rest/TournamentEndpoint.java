@@ -42,16 +42,14 @@ public class TournamentEndpoint {
    * Searches for tournaments with the given search parameters.
    *
    * @param searchParameters The search parameters
-   * @return ResponseEntity with status 200, along with the tournaments if there are results, 204 otherwise.
+   * @return ResponseEntity with status 200, along with the tournaments found
    */
   @GetMapping
   public ResponseEntity<Stream<TournamentListDto>> searchTournaments(TournamentSearchParamsDto searchParameters) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("request parameters: {}", searchParameters);
     Stream<TournamentListDto> result = service.search(searchParameters);
-    return (result == null || result.findAny().isEmpty())
-        ? ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-        : ResponseEntity.ok(service.search(searchParameters));
+    return ResponseEntity.ok(service.search(searchParameters));
   }
 
   /**

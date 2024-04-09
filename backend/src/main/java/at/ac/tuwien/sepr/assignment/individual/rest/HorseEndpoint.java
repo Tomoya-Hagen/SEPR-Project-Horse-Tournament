@@ -40,16 +40,14 @@ public class HorseEndpoint {
    * Searches for horses based on the provided search parameters.
    *
    * @param searchParameters The search parameters
-   * @return ResponseEntity with status 200, along with the horses if there are results, 204 otherwise.
+   * @return ResponseEntity with status 200, along with the horses found
    */
   @GetMapping
   public ResponseEntity<Stream<HorseListDto>> searchHorses(HorseSearchDto searchParameters) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("request parameters:\n{}", searchParameters);
     Stream<HorseListDto> result = service.search(searchParameters);
-    return (result == null || result.findAny().isEmpty())
-        ? ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-        : ResponseEntity.ok(service.search(searchParameters));
+    return ResponseEntity.ok(service.search(searchParameters));
   }
 
   /**

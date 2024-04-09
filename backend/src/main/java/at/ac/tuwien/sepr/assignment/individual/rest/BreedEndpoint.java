@@ -32,15 +32,13 @@ public class BreedEndpoint {
    * Searches for breeds based on the provided search parameters.
    *
    * @param searchParams  The search parameters
-   * @return ResponseEntity with HTTP status 200, along with the Breeds if there are results, 204 otherwise.
+   * @return ResponseEntity with HTTP status 200, along with the breeds found
    */
   @GetMapping
   public ResponseEntity<Stream<BreedDto>> search(BreedSearchDto searchParams) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("Request Params: {}", searchParams);
     Stream<BreedDto> breeds = service.search(searchParams);
-    return (breeds == null || breeds.toList().isEmpty())
-        ? ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-        : ResponseEntity.ok(service.search(searchParams));
+    return ResponseEntity.ok(service.search(searchParams));
   }
 }
