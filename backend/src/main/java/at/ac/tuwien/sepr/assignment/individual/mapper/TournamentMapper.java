@@ -19,6 +19,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Mapper class that maps a {@link Tournament} to a {@link TournamentListDto}
+ * It also includes the logic to generate and fill the tournament standings tree, which is used in entityToTournamentStandingsDto
+ */
 @Component
 public class TournamentMapper {
 
@@ -65,6 +69,14 @@ public class TournamentMapper {
     );
   }
 
+  /**
+   * Converts a HorseSelectionDto, together with its entryNo. and the number of round reached to a {@link TournamentDetailParticipantDto}
+   *
+   * @param horseSelectionDto the {@link HorseSelectionDto} to convert
+   * @param entryNo the entryNo of the {@link HorseSelectionDto}
+   * @param roundReached the number of round reached
+   * @return the converted {@link TournamentDetailParticipantDto}
+   */
   public TournamentDetailParticipantDto entityToTournamentDetailParticipantDto(HorseSelectionDto horseSelectionDto,
                                                                                int entryNo, int roundReached) {
     LOG.trace("entityToTournamentDetailParticipantDto({})", horseSelectionDto);
@@ -81,6 +93,15 @@ public class TournamentMapper {
     );
   }
 
+  /**
+   * Convert a tournament entity object, together with its participants to a {@link TournamentStandingsDto}.
+   * It calls generateTree and fillStandingsTree to create and if participants are given, fill the tree accordingly.
+   *
+   * @param tournament the {@link Tournament} to convert
+   * @param horseTournaments the {@link HorseTournament}s of the tournament
+   * @param horses the {@link HorseSelectionDto}s of the {@link HorseTournament}s to help create a list of {@link TournamentDetailParticipantDto}s
+   * @return the converted {@link TournamentStandingsDto}
+   */
   public TournamentStandingsDto entityToTournamentStandingsDto(Tournament tournament, Collection<HorseTournament> horseTournaments,
                                                                Map<Long, HorseSelectionDto> horses) {
     LOG.trace("entityToTournamentStandingsDto({})", tournament);
@@ -94,20 +115,6 @@ public class TournamentMapper {
           horse.dateOfBirth())), horseTournament.getEntryNumber(), horseTournament.getRoundReached()));
     }
     TournamentStandingsTreeDto root = generateTree(null, 1);
-    int number = 0;
-    for (HorseTournament participant : horseTournaments) {
-      if (participant.getEntryNumber() == -1) {
-        number++;
-      }
-    }
-    if (number == 8) {
-      return new TournamentStandingsDto(
-          tournament.getId(),
-          tournament.getName(),
-          participants,
-          root
-      );
-    }
     List<TournamentDetailParticipantDto> participantsSortedByEntryNumber = new ArrayList<>(participants);
     participantsSortedByEntryNumber.sort(Comparator.comparingInt(TournamentDetailParticipantDto::entryNumber));
     root = fillStandingsTree(root, participantsSortedByEntryNumber, 4);
@@ -129,7 +136,7 @@ public class TournamentMapper {
       root.branches().add(generateTree(null, i + 1));
       root.branches().add(generateTree(null, i + 1));
     } else {
-      root = new TournamentStandingsTreeDto(null, null);
+      root = new TournamentStandingsTreeDto(null, null); //leaf node
     }
     return root;
   }
@@ -161,6 +168,13 @@ public class TournamentMapper {
     return root;
   }
 
+  /**
+   * convert a {@link TournamentDetailParticipantDto} to a {@link HorseTournament}
+   *
+   * @param horse the {@link TournamentDetailParticipantDto} to convert
+   * @param tournamentId the {@link Tournament} id to pass to the {@link HorseTournament}
+   * @return the converted {@link HorseTournament}
+   */
   public HorseTournament tournamentDetailParticipantDtoToHorseTournament(TournamentDetailParticipantDto horse, Long tournamentId) {
     LOG.trace("tournamentDetailParticipantDtoToEntity({})", horse);
     if (horse == null) {

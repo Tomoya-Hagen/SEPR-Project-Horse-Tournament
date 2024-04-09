@@ -13,6 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper class that maps a {@link Horse} to a {@link HorseListDto}
+ */
 @Component
 public class HorseMapper {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -45,6 +48,7 @@ public class HorseMapper {
    * The given map of breeds needs to contain the breed of {@code horse}.
    *
    * @param horse the horse to convert
+   * @param breeds a map of breeds identified by their id, required for mapping horses
    * @return the converted {@link HorseListDto}
    */
   public HorseDetailDto entityToDetailDto(Horse horse, Map<Long, BreedDto> breeds) {
@@ -64,6 +68,12 @@ public class HorseMapper {
     );
   }
 
+  /**
+   * Convert a horse entity object to a {@link HorseSelectionDto}.
+   *
+   * @param horse the horse to convert
+   * @return the converted {@link HorseSelection}
+   */
   public HorseSelectionDto entityToSelectionDto(Horse horse) {
     LOG.trace("entityToDto({})", horse);
     if (horse == null) {
