@@ -78,16 +78,4 @@ public class Horse {
     return this;
   }
 
-  @Override
-  public String toString() {
-    return "Horse{"
-        + "id=" + id
-        + ", name='" + name + '\''
-        + ", sex=" + sex
-        + ", dateOfBirth=" + dateOfBirth
-        + ", height=" + height
-        + ", weight=" + weight
-        + ", breed=" + breedId
-        + '}';
-  }
 }

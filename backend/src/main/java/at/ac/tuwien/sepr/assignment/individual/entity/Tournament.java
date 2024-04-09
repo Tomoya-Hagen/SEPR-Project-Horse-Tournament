@@ -48,14 +48,5 @@ public class Tournament {
     return this;
   }
 
-  @Override
-  public String toString() {
-    return "Tournament{"
-        + "id=" + id
-        + ", name='" + name + '\''
-        + ", startDate=" + startDate
-        + ", endDate=" + endDate
-        + '}';
-  }
 
 }

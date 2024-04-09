@@ -1,5 +1,9 @@
 package at.ac.tuwien.sepr.assignment.individual.entity;
 
+
+/**
+ * Represents a horse participating in a specific tournament in the persistent data store.
+ */
 public class HorseTournament {
   private final Long horseId;
   private final Long tournamentId;
