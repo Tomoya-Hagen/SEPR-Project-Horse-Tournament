@@ -5,6 +5,14 @@ import java.time.LocalDate;
 
 /**
  * DTO record for the details of horse
+ *
+ * @param id id of the horse
+ * @param name name of the horse
+ * @param sex sex of the horse
+ * @param dateOfBirth date of birth of the horse
+ * @param height height of the horse
+ * @param weight weight of the horse
+ * @param breed breed of the horse
  */
 public record HorseDetailDto(
     Long id,
