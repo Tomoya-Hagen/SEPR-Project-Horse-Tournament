@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * DAO for tournaments.
+ * Interface for DAO for tournaments.
  * Implements access functionality to the application's persistent data store regarding tournaments.
  */
 public interface TournamentDao {
@@ -47,7 +47,7 @@ public interface TournamentDao {
    * Get the tournaments of the last 12 months.
    *
    * @param startDate this tournament's start date
-   * @return the tournaments of the last 12 months
+   * @return the tournaments of the last 12 months, excluding the given start date
    * @throws NotFoundException if no tournaments could be found
    */
   List<Tournament> getLast12MonthsTournaments(LocalDate startDate) throws NotFoundException;

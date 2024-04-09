@@ -7,7 +7,7 @@ import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
 import java.util.Collection;
 
 /**
- * DAO for horses.
+ * Interface for DAO for horses.
  * Implements access functionality to the application's persistent data store regarding horses.
  */
 public interface HorseDao {
@@ -56,11 +56,4 @@ public interface HorseDao {
    */
   void delete(long id);
 
-  /**
-   * Get the horses from the persistent data store with the given IDs.
-   *
-   * @param ids the IDs of the horses to get
-   * @return the horses
-   */
-  Collection<Horse> getByIds(Collection<Long> ids);
 }

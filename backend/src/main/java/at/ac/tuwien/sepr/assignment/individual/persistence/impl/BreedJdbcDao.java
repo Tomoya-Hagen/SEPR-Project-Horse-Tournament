@@ -15,6 +15,10 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+/**
+ * DAO for breeds.
+ * Implements access functionality to the application's persistent data store regarding breeds.
+ */
 @Repository
 public class BreedJdbcDao implements BreedDao {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

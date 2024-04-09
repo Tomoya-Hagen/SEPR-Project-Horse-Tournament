@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * DAO for working with horses in a tournament.
+ * Interface for DAO for working with horses in a tournament.
  * Implements access functionality to the application's persistent data store regarding horses in a tournament.'
  */
 public interface HorseTournamentDao {

@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * DAO for breeds.
+ * Interface for DAO for breeds.
  * Implements access functionality to the application's persistent data store regarding breeds.
  */
 public interface BreedDao {
@@ -21,6 +21,7 @@ public interface BreedDao {
 
   /**
    * Search for breeds with the given search parameters.
+   * Parameters that are {@code null} are ignored.
    *
    * @param searchParams  the search parameters
    * @return A collection of the breeds with the given search parameters

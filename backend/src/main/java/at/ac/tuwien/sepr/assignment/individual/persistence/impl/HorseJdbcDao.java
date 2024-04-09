@@ -19,6 +19,10 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+/**
+ * DAO for horses.
+ * Implements access functionality to the application's persistent data store regarding horses.
+ */
 @Repository
 public class HorseJdbcDao implements HorseDao {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -178,12 +182,6 @@ public class HorseJdbcDao implements HorseDao {
       LOG.error("Deletion of horse with ID {} failed.", id);
       throw new FatalException("Could not delete horse with ID " + id);
     }
-  }
-
-  @Override
-  public Collection<Horse> getByIds(Collection<Long> ids) {
-    LOG.trace("getByIds({})", ids);
-    return jdbcTemplate.query(SQL_SELECT_BY_ID, this::mapRow, ids);
   }
 
 }

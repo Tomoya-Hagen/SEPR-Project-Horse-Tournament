@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * DAO for working with horses in a tournament.
+ * Implements access functionality to the application's persistent data store regarding horses in a tournament.'
+ */
 @Repository
 public class HorseTournamentJdbcDao implements HorseTournamentDao {
 

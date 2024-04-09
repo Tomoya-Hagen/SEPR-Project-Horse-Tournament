@@ -22,6 +22,10 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * DAO for tournaments.
+ * Implements access functionality to the application's persistent data store regarding tournaments.
+ */
 @Repository
 public class TournamentJdbcDao implements TournamentDao {
 
