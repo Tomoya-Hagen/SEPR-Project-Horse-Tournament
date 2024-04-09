@@ -39,4 +39,12 @@ public interface HorseTournamentDao {
   */
   Map<Long, List<HorseTournament>> getHorsesByIDsTournaments(Set<Long> tournamentIds);
 
+  /**
+   * Checks if the horse with the given id participates in any tournament
+   *
+   * @param horseId the id of the horse to check
+   * @return the HorseTournament object (-s) with the given id if it participates in any tournament, or else null
+   */
+  List<HorseTournament> getParticipatingHorse(Long horseId);
+
 }

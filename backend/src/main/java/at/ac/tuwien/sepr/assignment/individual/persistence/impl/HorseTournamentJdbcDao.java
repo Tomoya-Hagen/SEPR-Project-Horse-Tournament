@@ -5,6 +5,8 @@ import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepr.assignment.individual.persistence.HorseTournamentDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +14,7 @@ import java.lang.invoke.MethodHandles;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +34,11 @@ public class HorseTournamentJdbcDao implements HorseTournamentDao {
       + " horse_id, entry_number, round_reached, tournament_id"
       + " FROM " + TABLE_NAME
       + " WHERE tournament_id = ? ";
+
+  private static final String SQL_SEARCH_HORSE_BY_ID_HORSE = "SELECT "
+      + " horse_id, entry_number, round_reached, tournament_id"
+      + " FROM " + TABLE_NAME
+      + " WHERE horse_id = ? ";
 
   private static final String SQL_SET_ENTRY_NUMBER_AND_REACHED_ROUND = "UPDATE "
       + " tournament_horses " + " SET entry_number = ?, round_reached = ? WHERE horse_id = ? AND tournament_id = ?";
@@ -67,6 +75,17 @@ public class HorseTournamentJdbcDao implements HorseTournamentDao {
     }
 
     return results;
+  }
+
+  @Override
+  public List<HorseTournament> getParticipatingHorse(Long horseId) {
+    LOG.trace("getHorseTournamentById({})", horseId);
+    try {
+      return jdbcTemplate.query(SQL_SEARCH_HORSE_BY_ID_HORSE, this::mapHorseRow, horseId);
+    } catch (EmptyResultDataAccessException e) {
+      LOG.trace("The horse does not participate in any tournament");
+      return Collections.emptyList();
+    }
   }
 
   @Override

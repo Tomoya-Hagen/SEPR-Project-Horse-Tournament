@@ -3,6 +3,8 @@ package at.ac.tuwien.sepr.assignment.individual.persistence;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
+import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 
 import java.util.Collection;
 
@@ -38,8 +40,9 @@ public interface HorseDao {
    *
    * @param id the ID of the horse to get
    * @return the horse
+   * @throws NotFoundException if no horse with the given ID is found
    */
-  Horse getById(long id);
+  Horse getById(long id) throws NotFoundException;
 
   /**
    * Create a horse with the data given.
@@ -54,6 +57,6 @@ public interface HorseDao {
    *
    * @param id the ID of the horse to delete
    */
-  void delete(long id);
+  void delete(long id) throws ConflictException;
 
 }

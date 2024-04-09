@@ -3,13 +3,16 @@ package at.ac.tuwien.sepr.assignment.individual.persistence.impl;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
+import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.persistence.HorseDao;
 import at.ac.tuwien.sepr.assignment.individual.type.Sex;
 import java.lang.invoke.MethodHandles;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.slf4j.Logger;
@@ -62,19 +65,28 @@ public class HorseJdbcDao implements HorseDao {
   private final JdbcTemplate jdbcTemplate;
   private final NamedParameterJdbcTemplate jdbcNamed;
 
+  private HorseTournamentJdbcDao horseTournamentDao;
+
 
   public HorseJdbcDao(
       NamedParameterJdbcTemplate jdbcNamed,
-      JdbcTemplate jdbcTemplate) {
+      JdbcTemplate jdbcTemplate,
+      HorseTournamentJdbcDao horseTournamentDao) {
     this.jdbcTemplate = jdbcTemplate;
     this.jdbcNamed = jdbcNamed;
+    this.horseTournamentDao = horseTournamentDao;
   }
 
   @Override
-  public Horse getById(long id) {
+  public Horse getById(long id) throws NotFoundException {
     LOG.trace("getById({})", id);
     List<Horse> horses;
     horses = jdbcTemplate.query(SQL_SELECT_BY_ID, this::mapRow, id);
+
+    if (horses.isEmpty()) {
+      LOG.warn("Could not find horse with ID {}", id);
+      throw new NotFoundException("Could not find horse with ID " + id);
+    }
 
     return horses.get(0);
   }
@@ -174,8 +186,16 @@ public class HorseJdbcDao implements HorseDao {
   }
 
   @Override
-  public void delete(long id) {
+  public void delete(long id) throws ConflictException {
     LOG.trace("delete({})", id);
+
+    if (!horseTournamentDao.getParticipatingHorse(id).isEmpty()) {
+      LOG.warn("Deletion of horse with ID {} failed. Horse is participating in a tournament.", id);
+      List<String> errors = new ArrayList<>();
+      errors.add("Horse is participating in a tournament.");
+      throw new ConflictException("Could not delete horse with ID " + id, errors);
+    }
+
     int deleted = jdbcTemplate.update(SQL_DELETE, id);
 
     if (deleted == 0) {
