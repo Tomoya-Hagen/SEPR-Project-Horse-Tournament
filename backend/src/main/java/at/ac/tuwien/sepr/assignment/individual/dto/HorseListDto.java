@@ -4,7 +4,7 @@ import at.ac.tuwien.sepr.assignment.individual.type.Sex;
 import java.time.LocalDate;
 
 /**
- * DTO class for list of horses in search view.
+ * DTO record for a horse in the list of horses in search view.
  */
 public record HorseListDto(
     Long id,
