@@ -7,10 +7,15 @@ import java.lang.invoke.MethodHandles;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Class for handling a REST request for Breeds.
+ */
 @RestController
 @RequestMapping(path = BreedEndpoint.BASE_PATH)
 public class BreedEndpoint {
@@ -23,10 +28,19 @@ public class BreedEndpoint {
     this.service = service;
   }
 
+  /**
+   * Searches for breeds based on the provided search parameters.
+   *
+   * @param searchParams  The search parameters
+   * @return ResponseEntity with HTTP status 200, along with the Breeds if there are results, 204 otherwise.
+   */
   @GetMapping
-  public Stream<BreedDto> search(BreedSearchDto searchParams) {
+  public ResponseEntity<Stream<BreedDto>> search(BreedSearchDto searchParams) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("Request Params: {}", searchParams);
-    return service.search(searchParams);
+    Stream<BreedDto> breeds = service.search(searchParams);
+    return (breeds == null || breeds.toList().isEmpty())
+        ? ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+        : ResponseEntity.ok(service.search(searchParams));
   }
 }

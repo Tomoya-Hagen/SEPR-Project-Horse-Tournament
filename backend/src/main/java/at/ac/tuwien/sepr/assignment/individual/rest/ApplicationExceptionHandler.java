@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * Exception handler for the application.
+ */
 @RestControllerAdvice
 public class ApplicationExceptionHandler {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
