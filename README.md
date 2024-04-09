@@ -31,5 +31,6 @@ Vergessen Sie nicht im Projekt ihren Namen und Matrikelnummer zu ersetzen.
 | 06.04. | 21:30 | 1h | 7 | BE |
 | 07.04. | 23:30 | 1,5h | 7 | FE |
 | 08.04. | 20:00 | 4h | 8 | BE, FE |
+| 09.04. | 12:00 | 8h | 8 | BE, FE, TS |
 
-**Gesamtsumme der Zeit**: 75.75h
+**Gesamtsumme der Zeit**: 83.75h
