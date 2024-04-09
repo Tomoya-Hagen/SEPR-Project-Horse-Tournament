@@ -18,6 +18,7 @@ public record HorseDetailDto(
 
   /**
    * Creates a new instance of HorseDetailDto with a new ID.
+   *
    * @param newId new id
    * @return new instance of HorseDetailDto
    */
