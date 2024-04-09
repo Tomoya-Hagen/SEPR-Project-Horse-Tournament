@@ -3,6 +3,8 @@ package at.ac.tuwien.sepr.assignment.individual.service;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
+import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import java.util.stream.Stream;
 
@@ -38,7 +40,7 @@ public interface HorseService {
    * @param id the ID of the horse to get
    * @return the horse with ID {@code id}
    */
-  HorseDetailDto getById(long id);
+  HorseDetailDto getById(long id) throws NotFoundException;
 
   /**
    * Create a horse with the data given.
@@ -54,5 +56,5 @@ public interface HorseService {
    *
    * @param id the ID of the horse to delete
    */
-  void delete(long id);
+  void delete(long id) throws ConflictException;
 }

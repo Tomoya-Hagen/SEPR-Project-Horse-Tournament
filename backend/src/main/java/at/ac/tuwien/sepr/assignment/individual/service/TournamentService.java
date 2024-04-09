@@ -42,7 +42,7 @@ public interface TournamentService {
    * @param tournamentId the id of the tournament to get the standings for.
    * @return the standings for the given tournament.
    */
-  TournamentStandingsDto getStandingsByTournamentId(Long tournamentId);
+  TournamentStandingsDto getStandingsByTournamentId(Long tournamentId) throws NotFoundException;
 
   /**
    * Update the standings for the given tournament.
@@ -51,7 +51,7 @@ public interface TournamentService {
    * @return the updated standings.
    * @throws ValidationException if the data given for the standings is invalid
    */
-  TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException;
+  TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException, NotFoundException;
 
   /**
    * Fill the tournament standings tree.

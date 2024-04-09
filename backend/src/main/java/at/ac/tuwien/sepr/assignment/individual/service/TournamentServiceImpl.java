@@ -79,7 +79,7 @@ public class TournamentServiceImpl implements TournamentService {
   }
 
   @Override
-  public TournamentStandingsDto getStandingsByTournamentId(Long tournamentId) {
+  public TournamentStandingsDto getStandingsByTournamentId(Long tournamentId) throws NotFoundException {
     LOG.trace("getStandingsByTournamentId({})", tournamentId);
     Tournament tournament = tournamentDao.getById(tournamentId);
     Collection<HorseTournament> horseTournaments = horseTournamentDao.getHorsesByIDTournament(tournamentId);
@@ -91,7 +91,7 @@ public class TournamentServiceImpl implements TournamentService {
   }
 
   @Override
-  public TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException {
+  public TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException, NotFoundException {
     LOG.trace("updateStandings({})", standings);
     validator.validateForStandings(standings);
     List<HorseTournament> horseTournaments = new ArrayList<>();
@@ -178,7 +178,12 @@ public class TournamentServiceImpl implements TournamentService {
       int compareByValue = entry1.getValue().compareTo(entry2.getValue());
 
       if (compareByValue == 0) {
-        return horseDao.getById(entry1.getKey()).getName().compareTo(horseDao.getById(entry2.getKey()).getName());
+        try {
+          return horseDao.getById(entry1.getKey()).getName().compareTo(horseDao.getById(entry2.getKey()).getName());
+        } catch (NotFoundException e) {
+          LOG.warn(e.getMessage(), e);
+          throw new RuntimeException(e);
+        }
       } else {
         return compareByValue;
       }

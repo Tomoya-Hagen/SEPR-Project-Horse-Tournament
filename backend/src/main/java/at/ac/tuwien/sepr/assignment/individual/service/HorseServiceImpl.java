@@ -5,6 +5,8 @@ import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
+import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepr.assignment.individual.mapper.HorseMapper;
 import at.ac.tuwien.sepr.assignment.individual.persistence.HorseDao;
@@ -62,7 +64,7 @@ public class HorseServiceImpl implements HorseService {
 
 
   @Override
-  public HorseDetailDto getById(long id) {
+  public HorseDetailDto getById(long id) throws NotFoundException {
     LOG.trace("getById({})", id);
     Horse horse = dao.getById(id);
     var breeds = breedMapForSingleHorse(horse);
@@ -90,7 +92,7 @@ public class HorseServiceImpl implements HorseService {
   }
 
   @Override
-  public void delete(long id) {
+  public void delete(long id) throws ConflictException {
     LOG.trace("delete({})", id);
     dao.delete(id);
   }
