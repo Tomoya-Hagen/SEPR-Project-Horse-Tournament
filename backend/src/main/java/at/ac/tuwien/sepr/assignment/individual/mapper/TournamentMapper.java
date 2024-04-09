@@ -115,20 +115,6 @@ public class TournamentMapper {
           horse.dateOfBirth())), horseTournament.getEntryNumber(), horseTournament.getRoundReached()));
     }
     TournamentStandingsTreeDto root = generateTree(null, 1);
-    int number = 0;
-    for (HorseTournament participant : horseTournaments) {
-      if (participant.getEntryNumber() == -1) {
-        number++;
-      }
-    }
-    if (number == 8) {
-      return new TournamentStandingsDto(
-          tournament.getId(),
-          tournament.getName(),
-          participants,
-          root
-      );
-    }
     List<TournamentDetailParticipantDto> participantsSortedByEntryNumber = new ArrayList<>(participants);
     participantsSortedByEntryNumber.sort(Comparator.comparingInt(TournamentDetailParticipantDto::entryNumber));
     root = fillStandingsTree(root, participantsSortedByEntryNumber, 4);
