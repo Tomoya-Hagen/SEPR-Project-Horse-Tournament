@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.assignment.individual.rest;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepr.assignment.individual.service.HorseService;
@@ -46,7 +47,6 @@ public class HorseEndpoint {
   public ResponseEntity<Stream<HorseListDto>> searchHorses(HorseSearchDto searchParameters) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("request parameters:\n{}", searchParameters);
-    Stream<HorseListDto> result = service.search(searchParameters);
     return ResponseEntity.ok(service.search(searchParameters));
   }
 
@@ -109,13 +109,18 @@ public class HorseEndpoint {
    * Deletes a horse by id.
    *
    * @param id the id of the horse to be deleted
-   * @return ResponseEntity with status 204
+   * @return ResponseEntity with status 204 if deletion was successful, 409 if the horse is participating in a tournament
    */
   @DeleteMapping("{id}")
   public ResponseEntity<Void> delete(@PathVariable("id") long id) {
     LOG.info("DELETE " + BASE_PATH + "/{}", id);
     LOG.debug("request parameters: {}", id);
-    service.delete(id);
-    return ResponseEntity.noContent().build();
+    try {
+      service.delete(id);
+      return ResponseEntity.noContent().build();
+    } catch (ConflictException e) {
+      HttpStatus status = HttpStatus.CONFLICT;
+      return ResponseEntity.status(status).build();
+    }
   }
 }

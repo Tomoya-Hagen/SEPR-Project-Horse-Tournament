@@ -38,7 +38,6 @@ public class BreedEndpoint {
   public ResponseEntity<Stream<BreedDto>> search(BreedSearchDto searchParams) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("Request Params: {}", searchParams);
-    Stream<BreedDto> breeds = service.search(searchParams);
     return ResponseEntity.ok(service.search(searchParams));
   }
 }

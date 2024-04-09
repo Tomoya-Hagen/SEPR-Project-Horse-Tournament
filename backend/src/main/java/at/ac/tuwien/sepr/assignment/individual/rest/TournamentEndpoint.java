@@ -48,7 +48,6 @@ public class TournamentEndpoint {
   public ResponseEntity<Stream<TournamentListDto>> searchTournaments(TournamentSearchParamsDto searchParameters) {
     LOG.info("GET " + BASE_PATH);
     LOG.debug("request parameters: {}", searchParameters);
-    Stream<TournamentListDto> result = service.search(searchParameters);
     return ResponseEntity.ok(service.search(searchParameters));
   }
 
