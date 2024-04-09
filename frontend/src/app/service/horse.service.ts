@@ -1,6 +1,6 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {map, mergeMap, Observable, tap, throwError} from 'rxjs';
+import {catchError, mergeMap, Observable, tap, throwError} from 'rxjs';
 import {environment} from 'src/environments/environment';
 import {Horse, HorseListDto} from '../dto/horse';
 import {HorseSearch} from '../dto/horse';
@@ -9,6 +9,10 @@ import {formatIsoDate} from '../util/date-helper';
 
 const baseUri = environment.backendUrl + '/horses';
 
+/**
+ * Service for handling horses.
+ * It operates on the REST API.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -18,10 +22,29 @@ export class HorseService {
     private http: HttpClient,
   ) { }
 
+  /**
+   * Gets a horse by its id.
+   *
+   * @param id the id of the horse
+   * @returns An observable for the horse
+   * @throws an error if the horse was not found
+   */
   getById(id: number): Observable<Horse> {
-    return this.http.get<Horse>(`${baseUri}/${id}`);
+    return this.http.get<Horse>(`${baseUri}/${id}`)
+    .pipe(
+      catchError((error) => {
+        console.error('Error fetching horse', error);
+        throw error;
+      })
+    );
   }
 
+  /**
+   * searches for horses with the given parameters
+   *
+   * @param searchParams the search parameters
+   * @returns An observable for the list of horses
+   */
   search(searchParams: HorseSearch): Observable<HorseListDto[]> {
     if (searchParams.name === '') {
       delete searchParams.name;
@@ -56,11 +79,17 @@ export class HorseService {
    *
    * @param horse the data for the horse that should be created
    * @return an Observable for the created horse
+   * @throws throws an error if the horse was not created
    */
   create(horse: Horse): Observable<Horse> {
     return this.http.post<Horse>(
       baseUri,
       horse
+    ).pipe(
+      catchError((error) => {
+        console.error('Error creating horse:', error);
+        throw error;
+      })
     );
   }
 
@@ -96,6 +125,12 @@ export class HorseService {
     if (!id) {
       return throwError(() => ({message: "Horse has no id"}));
     }
-    return this.http.delete<void>(`${baseUri}/${id}`);
+    return this.http.delete<void>(`${baseUri}/${id}`)
+    .pipe(
+      catchError((error) => {
+        console.error('Error deleting horse', error);
+        throw error;
+      })
+    );
   }
 }

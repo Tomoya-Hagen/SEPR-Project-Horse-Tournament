@@ -1,6 +1,9 @@
 import {Injectable, SecurityContext} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 
+/**
+ * Service for formatting errors.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -10,6 +13,12 @@ export class ErrorFormatterService {
     private domSanitizer: DomSanitizer,
   ) { }
 
+  /**
+   * formats an error into a string
+   *
+   * @param error the error
+   * @returns the formatted error
+   */
   format(error: any): string {
     let message = this.domSanitizer.sanitize(SecurityContext.HTML, error.error.message) ?? '';
     if (!!error.error.errors) {
