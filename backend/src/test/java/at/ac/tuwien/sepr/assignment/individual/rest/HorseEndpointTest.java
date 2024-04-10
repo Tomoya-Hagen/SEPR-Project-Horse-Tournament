@@ -3,9 +3,13 @@ package at.ac.tuwien.sepr.assignment.individual.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import at.ac.tuwien.sepr.assignment.individual.TestBase;
+import at.ac.tuwien.sepr.assignment.individual.dto.BreedDto;
+import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepr.assignment.individual.type.Sex;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -130,5 +134,72 @@ public class HorseEndpointTest extends TestBase {
                 "Haflinger"),
             tuple(-32L, "Luna", Sex.FEMALE, LocalDate.of(2018, 10, 10),
                 "Welsh Cob"));
+  }
+
+  // checks if a certain horse can be successfully created, positive test
+  @Test
+  public void createHorseSuccessfully() throws Exception {
+    // Prepare a new horse to create
+    HorseDetailDto horseToCreate = new HorseDetailDto(
+        -100L,
+        "NewHorse",
+        Sex.MALE,
+        LocalDate.of(2022, 4, 10),
+        1,
+        500,
+        new BreedDto(-20, "Welsh Cob")
+    );
+
+    // Convert the horse object to JSON string
+    String horseJson = objectMapper.writeValueAsString(horseToCreate);
+
+    // Perform POST request to create the horse
+    byte[] responseContent = mockMvc.perform(MockMvcRequestBuilders
+            .post("/horses")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(horseJson)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andReturn().getResponse().getContentAsByteArray();
+
+    // Deserialize the response JSON to get the created horse
+    HorseDetailDto createdHorse = objectMapper.readValue(responseContent, HorseDetailDto.class);
+
+    // Verify that the created horse is not null
+    assertNotNull(createdHorse.id());
+    assertTrue(createdHorse.id() == -100L);
+    assertNotNull(createdHorse.name());
+    assertTrue(createdHorse.name().equals("NewHorse"));
+    assertNotNull(createdHorse.dateOfBirth());
+    assertTrue(createdHorse.dateOfBirth().equals(LocalDate.of(2022, 4, 10)));
+    assertNotNull(createdHorse.sex());
+    assertTrue(createdHorse.sex().equals(Sex.MALE));
+    assertNotNull(createdHorse.breed());
+  }
+
+  //checks if 409 is returend if a non-existent horse is tried to update, negative test
+  @Test
+  public void updateNonExistentHorseReturns409() throws Exception {
+    // Prepare a DTO for updating a non-existent horse
+    HorseDetailDto horseToUpdate = new HorseDetailDto(
+        -9999L, // Non-existent horse ID
+        "Updated Name",
+        Sex.MALE,
+        LocalDate.of(2010, 2, 20),
+        2,
+        320,
+        new BreedDto(-21, "Invalid Breed") // Invalid breed
+    );
+
+    // Convert the horse object to JSON string
+    String horseJson = objectMapper.writeValueAsString(horseToUpdate);
+
+    // Perform PATCH request to update the horse
+    mockMvc.perform(MockMvcRequestBuilders
+            .put("/horses/{id}", -9999L)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(horseJson)
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isConflict());
   }
 }

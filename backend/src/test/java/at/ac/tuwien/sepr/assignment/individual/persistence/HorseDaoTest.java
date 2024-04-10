@@ -3,12 +3,15 @@ package at.ac.tuwien.sepr.assignment.individual.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import at.ac.tuwien.sepr.assignment.individual.TestBase;
 import at.ac.tuwien.sepr.assignment.individual.dto.BreedDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSearchDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
+import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepr.assignment.individual.type.Sex;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -123,6 +126,22 @@ public class HorseDaoTest extends TestBase {
     assertEquals(createdHorse.getHeight(), horse.height());
     assertEquals(createdHorse.getWeight(), horse.weight());
     assertEquals(createdHorse.getBreedId(), horse.breed().id());
+  }
+
+  @Test
+  public void updateNonExistentHorseThrowsException() {
+    Long nonExistentHorseId = -9999L;
+    HorseDetailDto horseDetailDto = new HorseDetailDto(
+        nonExistentHorseId,
+        "Updated Name",
+        Sex.MALE,
+        LocalDate.of(2010, 2, 20),
+        2,
+        320,
+        null
+    );
+
+    assertThrows(ConflictException.class, () -> horseDao.update(horseDetailDto));
   }
 
 }

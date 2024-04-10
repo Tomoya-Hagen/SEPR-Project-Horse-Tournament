@@ -92,6 +92,19 @@ export class TournamentStandingsComponent implements OnInit {
         next: data => {
           this.standings = data;
           this.notification.success(`First round generated`, "First round generated successfully");
+          this.service.getStandings(this.route.snapshot.params['id'])
+          .subscribe({
+            next: data => {
+              this.standings = data;
+            },
+            error: error => {
+              console.error(error.message, error);
+              this.notification.error(this.errorFormatter.format(error), "Could Not Get Tournament Standings", {
+                enableHtml: true,
+                timeOut: 10000,
+              });
+            }
+          });
         },
         error: error => {
           console.error(error.message, error);
