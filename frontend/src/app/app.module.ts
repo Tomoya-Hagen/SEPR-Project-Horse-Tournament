@@ -18,6 +18,9 @@ import {TournamentStandingsComponent} from './component/tournament/tournament-st
 import {TournamentStandingsBranchComponent} from './component/tournament/tournament-standings/tournament-standings-branch/tournament-standings-branch.component';
 import { TournamentComponent } from './component/tournament/tournament/tournament.component';
 
+/**
+ * Module for all components
+ */
 @NgModule({
   declarations: [
     AppComponent,
