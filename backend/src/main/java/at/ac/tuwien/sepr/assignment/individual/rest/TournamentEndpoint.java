@@ -78,7 +78,7 @@ public class TournamentEndpoint {
    *
    * @param tournamentId the id of the tournament
    * @return ResponseEntity with status 200, along with the tournament standings if the tournament is obtained
-   * @thrwos ResponseStatusException 404 if no tournament or standings was found
+   * @throws ResponseStatusException 404 if no tournament or standings was found
    */
   @GetMapping("standings/{id}")
   public ResponseEntity<TournamentStandingsDto> getStandings(@PathVariable("id") Long tournamentId) {
