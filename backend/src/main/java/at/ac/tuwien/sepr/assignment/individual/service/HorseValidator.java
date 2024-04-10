@@ -3,8 +3,10 @@ package at.ac.tuwien.sepr.assignment.individual.service;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -17,11 +19,17 @@ public class HorseValidator {
     if (horse.name() == null) {
       validationErrors.add("No name given");
     }
+    if (horse.name() != null && horse.name().length() > 100) {
+      validationErrors.add("Name too long");
+    }
     if (horse.sex() == null) {
       validationErrors.add("No sex given");
     }
     if (horse.dateOfBirth() == null) {
       validationErrors.add("No date of birth given");
+    }
+    if (horse.dateOfBirth() != null && (horse.dateOfBirth().isAfter(LocalDate.now()) || horse.dateOfBirth().isBefore(LocalDate.of(1970, 1, 1)))) {
+      validationErrors.add("Invalid date of birth given");
     }
     if (horse.height() <= 0 || horse.height() >= 100) {
       validationErrors.add("Invalid height given");
