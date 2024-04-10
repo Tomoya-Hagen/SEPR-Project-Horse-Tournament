@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.assignment.individual.dto.HorseSelectionDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentCreateDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Tournament;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.persistence.TournamentDao;
@@ -102,7 +103,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
 
   @Override
-  public Tournament create(TournamentCreateDto tournament) {
+  public Tournament create(TournamentCreateDto tournament) throws ConflictException {
     LOG.trace("create({})", tournament);
     List<HorseSelectionDto> participants = tournament.participants();
 
@@ -157,17 +158,12 @@ public class TournamentJdbcDao implements TournamentDao {
   }
 
   @Override
-  public List<Tournament> getLast12MonthsTournaments(LocalDate startDate) throws NotFoundException {
+  public List<Tournament> getLast12MonthsTournaments(LocalDate startDate) {
     LOG.trace("getLast12MonthsTournamentStandings()");
     LocalDate endDate = startDate.minusMonths(12);
     startDate = startDate.minusDays(1); //exclude the start date
     List<Tournament> results = jdbcTemplate.query(SQL_FIND_LAST_12_MONTHS, this::mapRow, endDate, startDate);
-    if (results.isEmpty()) {
-      LOG.warn("Tournaments could not be found");
-      throw new NotFoundException("Tournaments could not be found");
-    } else {
-      return results;
-    }
+    return results;
   }
 
 }

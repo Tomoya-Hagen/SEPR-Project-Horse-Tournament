@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.assignment.individual.dto.BreedDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseDetailDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseListDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.HorseSelectionDto;
+import at.ac.tuwien.sepr.assignment.individual.dto.TournamentDetailParticipantDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
 import java.lang.invoke.MethodHandles;
@@ -96,5 +97,10 @@ public class HorseMapper {
           .orElseThrow(() -> new FatalException(
               "Saved horse with id " + horse.getId() + " refers to non-existing breed with id " + breedId));
     }
+  }
+
+  public TournamentDetailParticipantDto entityToTournamentParticipantDto(Horse horse, int i) {
+    LOG.trace("entityToTournamentParticipantDto({})", horse);
+    return new TournamentDetailParticipantDto(horse.getId(), horse.getName(), horse.getDateOfBirth(), i, 1);
   }
 }

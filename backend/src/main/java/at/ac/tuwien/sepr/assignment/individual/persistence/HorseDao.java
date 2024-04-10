@@ -7,6 +7,8 @@ import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for DAO for horses.
@@ -33,7 +35,7 @@ public interface HorseDao {
    * @param horse the horse to update
    * @return the updated horse
    */
-  Horse update(HorseDetailDto horse);
+  Horse update(HorseDetailDto horse) throws ConflictException;
 
   /**
    * Get a horse by its ID from the persistent data store.
@@ -58,5 +60,13 @@ public interface HorseDao {
    * @param id the ID of the horse to delete
    */
   void delete(long id) throws ConflictException;
+
+  /**
+   * Get the horses with the given IDs from the persistent data store.
+   *
+   * @param ids the IDs of the horses to get
+   * @return the horses
+   */
+  List<Horse> getByIds(Set<Long> ids) throws NotFoundException;
 
 }

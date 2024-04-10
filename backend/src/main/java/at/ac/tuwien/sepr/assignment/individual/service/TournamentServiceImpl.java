@@ -11,6 +11,7 @@ import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsTreeDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Horse;
 import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
 import at.ac.tuwien.sepr.assignment.individual.entity.Tournament;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 import at.ac.tuwien.sepr.assignment.individual.mapper.HorseMapper;
@@ -25,7 +26,9 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +65,7 @@ public class TournamentServiceImpl implements TournamentService {
   }
 
   @Override
-  public TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException {
+  public TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException, ConflictException {
     LOG.trace("create({})", tournament);
     validator.validateForCreate(tournament);
     var createdTournament = tournamentDao.create(tournament);
@@ -91,7 +94,7 @@ public class TournamentServiceImpl implements TournamentService {
   }
 
   @Override
-  public TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException, NotFoundException {
+  public TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException, NotFoundException, ConflictException {
     LOG.trace("updateStandings({})", standings);
     validator.validateForStandings(standings);
     List<HorseTournament> horseTournaments = new ArrayList<>();
@@ -131,14 +134,36 @@ public class TournamentServiceImpl implements TournamentService {
   }
 
   @Override
-  public List<TournamentDetailParticipantDto> calculatePointsForHorses(Long tournamentId) throws NotFoundException {
+  public List<TournamentDetailParticipantDto> calculatePointsForHorses(Long tournamentId) throws NotFoundException, ConflictException {
     LOG.trace("calculatePointsForHorses({})", tournamentId);
     Tournament tournament = tournamentDao.getById(tournamentId);
     LocalDate startDate = tournament.getStartDate();
     Collection<HorseTournament> horses = horseTournamentDao.getHorsesByIDTournament(tournamentId);
 
 
+
     List<Tournament> tournaments = tournamentDao.getLast12MonthsTournaments(startDate);
+    if (tournaments.size() == 0) {
+      List<Horse> horseList = horseDao.getByIds(horses.stream().map(HorseTournament::getHorseId).collect(Collectors.toSet()));
+      horseList.sort(Comparator.comparing(Horse::getName));
+      TournamentDetailParticipantDto[] results = new TournamentDetailParticipantDto[8];
+
+      for (int i = 0; i < horses.size() / 2; i++) {
+        results[2 * i] = horseMapper.entityToTournamentParticipantDto(horseList.get(i), 2 * i + 1);
+      }
+      int a = 1;
+      for (int i = 7; i >= horses.size() / 2; i--) {
+        results[a] = horseMapper.entityToTournamentParticipantDto(horseList.get(i), a + 1);
+        a = a + 2;
+      }
+
+      for (TournamentDetailParticipantDto dto : results) {
+        horseTournamentDao.updateStandings(tournamentId, dto.horseId(), dto.entryNumber(), 1);
+      }
+
+      return Arrays.asList(results);
+
+    }
     Set<Long> tournamentIds = tournaments.stream().map(Tournament::getId).collect(Collectors.toSet());
     Map<Long, List<HorseTournament>> map = horseTournamentDao.getHorsesByIDsTournaments(tournamentIds); //tournamentId, horseTournaments
 
@@ -216,7 +241,7 @@ public class TournamentServiceImpl implements TournamentService {
   }
 
   @Override
-  public TournamentStandingsDto generateFirstRound(TournamentStandingsDto standings) throws NotFoundException {
+  public TournamentStandingsDto generateFirstRound(TournamentStandingsDto standings) throws NotFoundException, ConflictException {
     LOG.trace("generateFirstRound({})", standings);
 
     Long tournamentId = standings.id();
