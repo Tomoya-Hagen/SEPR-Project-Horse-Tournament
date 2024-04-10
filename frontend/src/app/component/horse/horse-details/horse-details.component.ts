@@ -9,6 +9,9 @@ import {HorseService} from 'src/app/service/horse.service';
 import { Breed } from 'src/app/dto/breed';
 import { BreedService } from 'src/app/service/breed.service';
 
+/**
+ * Component for handling delete operations on horses in the horse detail view.
+ */
 @Component({
   selector: 'app-horse-details',
   templateUrl: './horse-details.component.html',
@@ -16,7 +19,6 @@ import { BreedService } from 'src/app/service/breed.service';
 })
 export class HorseDetailsComponent {
   horse: Horse | null = null;
-  // horse!: Horse;
 
   constructor(
     private service: HorseService,
@@ -25,6 +27,9 @@ export class HorseDetailsComponent {
     private notification: ToastrService,
   ) { }
 
+  /**
+   * Loads the horse.
+   */
   ngOnInit(): void {
     const id = this.route.snapshot.params['id'];
     if (id) {
@@ -43,11 +48,16 @@ export class HorseDetailsComponent {
   }
 
 
+  /**
+   * deletes the horse specified in the parameter
+   *
+   * @param horse the horse to delete
+   */
   deleteHorse(horse: Horse): void {
     if (!horse) {
       throw Error("HorseForDeletion is null or undefined");
     }
-    if (!horse.id) { //TODO: add condition for invalid id
+    if (!horse.id) {
       throw Error("HorseForDeletion has no id");
     }
     this.service.delete(horse.id).subscribe({
@@ -57,7 +67,7 @@ export class HorseDetailsComponent {
       },
       error: error => {
         console.error('Error deleting horse', error);
-        this.notification.error('Could not delete horse: ' + error.message, 'Error');
+        this.notification.error('Could not delete horse: It is participating in a tournament', 'Error');
       }
     })
   }

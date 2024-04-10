@@ -10,6 +10,9 @@ import {map, Observable} from "rxjs";
 import {HorseService} from "../../../service/horse.service";
 import {Location} from "@angular/common";
 
+/**
+ * Component for creating new tournaments.
+ */
 @Component({
   selector: 'app-tournament-create',
   templateUrl: './tournament-create.component.html',
@@ -65,6 +68,11 @@ export class TournamentCreateComponent {
   ) {
   }
 
+  /**
+   * Creates a new tournament on submitting
+   *
+   * @param form the NgForm to validate
+   */
   submit(form: NgForm) {
     console.log(form.valid, this.tournament);
     if (form.invalid)
@@ -104,6 +112,12 @@ export class TournamentCreateComponent {
       : `${participant.name} (${participant.dateOfBirth.toLocaleDateString()})`
   }
 
+  /**
+   * returns an observable of horses for autocomplete
+   *
+   * @param input the search string
+   * @returns an observable of horses
+   */
   horseSuggestions = (input: string): Observable<HorseSelection[]> =>
     this.horseService.search({name: input, limit: 5})
       .pipe(map(horses => horses.map(h => ({
@@ -112,6 +126,11 @@ export class TournamentCreateComponent {
         dateOfBirth: h.dateOfBirth,
       }))));
 
+  /**
+   * adds a horse to the tournament
+   *
+   * @param horse the horse to add
+   */
   public addHorse(horse: HorseSelection | null) {
     if (!horse)
       return;
@@ -136,6 +155,11 @@ export class TournamentCreateComponent {
     });
   }
 
+  /**
+   * Removes a horse from the tournament
+   *
+   * @param index the index of the participant
+   */
   public removeHorse(index: number) {
     this.participants.splice(index, 1);
     this.participants.push(null);

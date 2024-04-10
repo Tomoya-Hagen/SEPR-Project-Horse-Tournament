@@ -6,11 +6,17 @@ import {HorseSearch} from '../../dto/horse';
 import {debounceTime, map, Observable, of, Subject} from 'rxjs';
 import {BreedService} from "../../service/breed.service";
 
+/**
+ * Component for handling operations on horses.
+ */
 @Component({
   selector: 'app-horse',
   templateUrl: './horse.component.html',
   styleUrls: ['./horse.component.scss']
 })
+/**
+ * class for handling operations on horses.
+ */
 export class HorseComponent implements OnInit {
   search = false;
   horses: HorseListDto[] = [];
@@ -34,6 +40,9 @@ export class HorseComponent implements OnInit {
       .subscribe({next: () => this.reloadHorses()});
   }
 
+  /**
+   * Reloads the horses
+   */
   reloadHorses() {
     if (this.searchBornEarliest == null || this.searchBornEarliest === "") {
       delete this.searchParams.bornEarliest;
@@ -60,10 +69,20 @@ export class HorseComponent implements OnInit {
         }
       });
   }
+  /**
+    * Notifies subscribers that the search criteria has changed.
+    * This method is typically called when the user updates the search criteria.
+    */
   searchChanged(): void {
     this.searchChangedObservable.next();
   }
 
+  /**
+   * Suggests breed names based on the input string.
+   *
+   * @param input name of the horse
+   * @returns an observable for the list of suggested breed names
+   */
   breedSuggestions = (input: string): Observable<string[]> =>
     this.breedService.breedsByName(input, 5)
       .pipe(map(bs =>
@@ -71,12 +90,18 @@ export class HorseComponent implements OnInit {
 
   formatBreedName = (name: string) => name; // It is already the breed name, we just have to give a function to the component
 
+  /**
+   * deletes a horse
+   *
+   * @param horse the horse to delete
+   * @throws an error if the horse has no id or the horse is not defined
+   */
   deleteHorse(horse: Horse): void {
     this.horseForDeletion = horse;
     if (!this.horseForDeletion) {
       throw Error("HorseForDeletion is null or undefined");
     }
-    if (!this.horseForDeletion.id) { //TODO: add condition for invalid id
+    if (!this.horseForDeletion.id) {
       throw Error("HorseForDeletion has no id");
     }
     this.service.delete(this.horseForDeletion.id).subscribe({
@@ -87,7 +112,7 @@ export class HorseComponent implements OnInit {
       },
       error: error => {
         console.error('Error deleting horse', error);
-        this.notification.error('Could not delete horse: ' + error.message, 'Error');
+        this.notification.error('Could not delete horse: Horse is participating in a tournament', 'Error');
       }
     })
   }

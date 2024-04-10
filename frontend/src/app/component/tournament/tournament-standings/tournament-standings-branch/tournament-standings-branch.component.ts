@@ -8,6 +8,9 @@ enum TournamentBranchPosition {
   LOWER,
 }
 
+/**
+ * Component for displaying a branch of the tournament standings.
+ */
 @Component({
   selector: 'app-tournament-standings-branch',
   templateUrl: './tournament-standings-branch.component.html',
@@ -36,9 +39,15 @@ export class TournamentStandingsBranchComponent {
     return this.disabled;
   }
 
+  /**
+   * Returns the suggestions for the given input.
+   * The candidates are either the participants of the previous round matches in this branch
+   * or, if this is the first round, all participant horses.
+   *
+   * @param input the input to search for
+   * @returns an observable of the suggestions
+   */
   suggestions = (input: string) => {
-    // The candidates are either the participants of the previous round matches in this branch
-    // or, if this is the first round, all participant horses
     const allCandidates =
       this.treeBranch?.branches?.map(b => b.thisParticipant)
       ?? this.allParticipants;
@@ -50,12 +59,24 @@ export class TournamentStandingsBranchComponent {
     return of(results);
   };
 
+  /**
+   * This function formats the participant.
+   *
+   * @param participant the participant to format
+   * @returns the formatted participant
+   */
   public formatParticipant(participant: TournamentDetailParticipantDto | null): string {
     return participant
         ? `${participant.name} (${participant.dateOfBirth})`
         : "";
   }
 
+  /**
+   * This checks if the previous round matches are incomplete, to ensure consistency.
+   *
+   * @param branch the TournamentStandingsTreeDto to check
+   * @returns true, if the previous round matches are incomplete
+   */
   isMatchIncomplete(branch : TournamentStandingsTreeDto | undefined): boolean {
     if (!branch || !branch.branches) {
       return false;
@@ -69,6 +90,13 @@ export class TournamentStandingsBranchComponent {
     return false; // All child matches are complete
   }
 
+  /**
+   * This checks if the current node has a thisParticipant,
+   * if so, it means that its branches have a winner
+   *
+   * @param branch the parent node of the TournamentStandingsTreeDto branches to check
+   * @returns true if the branches has a winner
+   */
   isWinnerSet(branch : TournamentStandingsTreeDto | undefined): boolean {
     return branch?.thisParticipant ? true : false;
   }

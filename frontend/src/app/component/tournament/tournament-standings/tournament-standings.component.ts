@@ -7,6 +7,9 @@ import {Location} from "@angular/common";
 import {ToastrService} from "ngx-toastr";
 import {ErrorFormatterService} from "../../../service/error-formatter.service";
 
+/**
+ * Component for displaying the standings of a tournament
+ */
 @Component({
   selector: 'app-tournament-standings',
   templateUrl: './tournament-standings.component.html',
@@ -24,6 +27,9 @@ export class TournamentStandingsComponent implements OnInit {
   ) {
   }
 
+  /**
+   * Loads the tournament standings
+   */
   public ngOnInit() {
     this.service.getStandings(this.route.snapshot.params['id'])
       .subscribe({
@@ -40,6 +46,11 @@ export class TournamentStandingsComponent implements OnInit {
       });
   }
 
+  /**
+   * Creates new tournament standings on submitting
+   *
+   * @param form the NgForm to validate
+   */
   public submit(form: NgForm) {
     if (form.invalid) {
       return;
@@ -61,6 +72,10 @@ export class TournamentStandingsComponent implements OnInit {
     }
   }
 
+  /**
+   * Generates the matches of the first round of this tournament, if no participants are set yet.
+   *
+   */
   public generateFirstRound() {
     if (!this.standings) {
       return;

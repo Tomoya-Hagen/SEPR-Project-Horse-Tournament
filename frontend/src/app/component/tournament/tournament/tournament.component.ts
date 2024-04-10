@@ -5,6 +5,9 @@ import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
 
+/**
+ * Component for handling operations on tournaments.
+ */
 @Component({
   selector: 'app-tournament',
   templateUrl: './tournament.component.html',
@@ -32,6 +35,9 @@ export class TournamentComponent {
       });
   }
 
+  /**
+   * Reloads the tournaments
+   */
   reloadTournaments() {
     if (this.searchStartingEarliest == null || this.searchStartingEarliest === "") {
       delete this.searchParams.startDate;
@@ -55,11 +61,16 @@ export class TournamentComponent {
       });
   }
 
+  /**
+   * notifies the subscribers that the search criteria has changed
+   */
   searchChanged() {
     this.searchChangedObservable.next();
   }
 
-
+  /**
+   * Loads the tournaments
+   */
   loadTournaments(): void {
     this.service.getAll()
       .subscribe((tournaments: TournamentListDto[]) => {

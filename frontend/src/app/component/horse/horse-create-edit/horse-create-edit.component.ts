@@ -9,12 +9,17 @@ import {HorseService} from 'src/app/service/horse.service';
 import {Breed} from "../../../dto/breed";
 import {BreedService} from "../../../service/breed.service";
 
-
+/**
+ * enum for the different modes that the horse create edit component can be in
+ */
 export enum HorseCreateEditMode {
   create,
   edit,
 }
 
+/**
+ * Component for creating and editing horses
+ */
 @Component({
   selector: 'app-horse-create-edit',
   templateUrl: './horse-create-edit.component.html',
@@ -133,6 +138,9 @@ export class HorseCreateEditComponent implements OnInit {
     }
   }
 
+  /**
+   * Loads the horses to create or edit.
+   */
   ngOnInit(): void {
     const id = this.route.snapshot.params['id'];
     if (id) {
@@ -141,19 +149,27 @@ export class HorseCreateEditComponent implements OnInit {
         this.mode = HorseCreateEditMode.edit;
       });
     } else {
-      // this.route.data.subscribe(data => {
-      //   this.mode = data.mode;
-      // });
       this.mode = HorseCreateEditMode.create;
     }
   }
 
+  /**
+   * Returns boolean whether the input is invalid
+   * @param input to input to check
+   * @returns true if the input is invalid, flase otherwise
+   */
   public dynamicCssClassesForInput(input: NgModel): any {
     return {
       'is-invalid': !input.valid && !input.pristine,
     };
   }
 
+  /**
+   * formats the breed name
+   *
+   * @param breed the breed to format
+   * @returns string representation of the breed
+   */
   public formatBreedName(breed: Breed | null): string {
     return breed?.name ?? '';
   }
@@ -162,6 +178,12 @@ export class HorseCreateEditComponent implements OnInit {
     ? of([])
     :  this.breedService.breedsByName(input, 5);
 
+    /**
+     * This method is called when the form is submitted.
+     * It creates or updates the horse.
+     *
+     * @param form the NgForm
+     */
   public onSubmit(form: NgForm): void {
     console.log('is form valid?', form.valid, this.horse);
     if (form.valid) {
@@ -186,7 +208,6 @@ export class HorseCreateEditComponent implements OnInit {
           if(this.mode === HorseCreateEditMode.create) {
             console.error('Error creating horse', error);
             this.notification.error('Could not create horse: ' + error.message);
-          // TODO show an error message to the user. Include and sensibly present the info from the backend!
           }
           if(this.mode === HorseCreateEditMode.edit) {
             console.error('Error updating horse', error);
@@ -197,11 +218,17 @@ export class HorseCreateEditComponent implements OnInit {
     }
   }
 
+  /**
+   * deletes the given horse
+   *
+   * @param horse the horse to delete
+   * @throw an error if the horse has no id or the horse is not defined
+   */
   deleteHorse(horse: Horse): void {
     if (!horse) {
       throw Error("HorseForDeletion is null or undefined");
     }
-    if (!horse.id) { //TODO: add condition for invalid id
+    if (!horse.id) {
       throw Error("HorseForDeletion has no id");
     }
     this.service.delete(horse.id).subscribe({
