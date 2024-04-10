@@ -30,7 +30,7 @@ public interface HorseService {
    * @return he updated horse
    * @throws ValidationException if the update data given for the horse is invalid
    */
-  HorseDetailDto update(HorseDetailDto horse) throws ValidationException;
+  HorseDetailDto update(HorseDetailDto horse) throws ValidationException, ConflictException;
 
 
   /**

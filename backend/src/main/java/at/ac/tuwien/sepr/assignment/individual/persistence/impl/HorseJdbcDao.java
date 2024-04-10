@@ -15,6 +15,9 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,6 +35,8 @@ public class HorseJdbcDao implements HorseDao {
 
   private static final String TABLE_NAME = "horse";
   private static final String SQL_SELECT_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+
+  private static final String SQL_SELECT_BY_IDS = "SELECT * FROM " + TABLE_NAME + " WHERE id IN (:ids)";
   private static final String SQL_SELECT_SEARCH = "SELECT  "
           + "    h.id as \"id\", h.name as \"name\", h.sex as \"sex\", h.date_of_birth as \"date_of_birth\""
           + "    , h.height as \"height\", h.weight as \"weight\", h.breed_id as \"breed_id\""
@@ -43,6 +48,9 @@ public class HorseJdbcDao implements HorseDao {
           + "  AND (:breed IS NULL OR UPPER(b.name) LIKE UPPER('%'||:breed||'%'))";
 
   private static final String SQL_LIMIT_CLAUSE = " LIMIT :limit";
+  private static final String SQL_MAX_ID = " SELECT MAX(id) FROM " + TABLE_NAME;
+  private static final String SQL_MIN_ID = " SELECT MIN(id) FROM " + TABLE_NAME;
+
 
   private static final String SQL_UPDATE = "UPDATE "
       + TABLE_NAME
@@ -92,6 +100,21 @@ public class HorseJdbcDao implements HorseDao {
   }
 
   @Override
+  public List<Horse> getByIds(Set<Long> ids) throws NotFoundException {
+    LOG.trace("getByIds({})", ids);
+    List<Horse> horses;
+    horses = jdbcNamed.query(SQL_SELECT_BY_IDS, Map.of("ids", ids), this::mapRow);
+
+    if (horses.isEmpty()) {
+      LOG.warn("Could not find horse with ID {}", ids);
+      throw new NotFoundException("Could not find horse with ID " + ids);
+    }
+
+    return horses;
+  }
+
+
+  @Override
   public Collection<Horse> search(HorseSearchDto searchParameters) {
     LOG.trace("search({})", searchParameters);
     var query = SQL_SELECT_SEARCH;
@@ -105,8 +128,22 @@ public class HorseJdbcDao implements HorseDao {
 
 
   @Override
-  public Horse update(HorseDetailDto horse) {
+  public Horse update(HorseDetailDto horse) throws ConflictException {
     LOG.trace("update({})", horse);
+
+    Long minId = jdbcTemplate.queryForObject(SQL_MIN_ID, Long.class);
+    Long maxId = jdbcTemplate.queryForObject(SQL_MAX_ID, Long.class);
+
+    // Check if the horse ID is outside the range of minimum and maximum IDs
+    if (minId != null && maxId != null) {
+      if (horse.id() < minId || horse.id() > maxId) {
+        LOG.warn("Update of horse failed. Horse ID is outside the range of IDs stored in the database.");
+        List<String> errors = new ArrayList<>();
+        errors.add("Update of horse failed. Horse ID is outside the range of IDs stored in the database.");
+        throw new ConflictException("Horse ID is outside the range of IDs stored in the database", errors);
+      }
+    }
+
     int updated = jdbcTemplate.update(SQL_UPDATE,
         horse.name(),
         horse.sex().toString(),

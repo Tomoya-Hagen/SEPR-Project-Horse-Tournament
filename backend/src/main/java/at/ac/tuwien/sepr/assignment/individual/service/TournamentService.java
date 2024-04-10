@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentStandingsTreeDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 import at.ac.tuwien.sepr.assignment.individual.exception.ValidationException;
 
@@ -34,7 +35,7 @@ public interface TournamentService {
    * @return the created tournament
    * @throws ValidationException if the data given for the tournament is invalid
    */
-  TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException;
+  TournamentDetailDto create(TournamentCreateDto tournament) throws ValidationException, ConflictException;
 
   /**
    * Get the tournament standings with the given id.
@@ -51,7 +52,7 @@ public interface TournamentService {
    * @return the updated standings.
    * @throws ValidationException if the data given for the standings is invalid
    */
-  TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException, NotFoundException;
+  TournamentStandingsDto updateStandings(TournamentStandingsDto standings) throws ValidationException, NotFoundException, ConflictException;
 
   /**
    * Fill the tournament standings tree.
@@ -70,7 +71,7 @@ public interface TournamentService {
    * @return the horses participating in the tournaments
    * @throws NotFoundException if the tournament with the given id or the tournaments from the past 12months could not be found.
    */
-  List<TournamentDetailParticipantDto> calculatePointsForHorses(Long tournamentId) throws NotFoundException;
+  List<TournamentDetailParticipantDto> calculatePointsForHorses(Long tournamentId) throws NotFoundException, ConflictException;
 
   /**
    * Generate the first round of the standings.
@@ -79,6 +80,6 @@ public interface TournamentService {
    * @return the standings after the first round has been generated.
    * @throws NotFoundException if the tournament with the given id or the tournaments from the past 12months could not be found.
    */
-  TournamentStandingsDto generateFirstRound(TournamentStandingsDto standings) throws NotFoundException;
+  TournamentStandingsDto generateFirstRound(TournamentStandingsDto standings) throws NotFoundException, ConflictException;
 
 }

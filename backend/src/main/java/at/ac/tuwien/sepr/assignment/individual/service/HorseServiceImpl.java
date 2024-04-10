@@ -54,7 +54,7 @@ public class HorseServiceImpl implements HorseService {
 
 
   @Override
-  public HorseDetailDto update(HorseDetailDto horse) throws ValidationException {
+  public HorseDetailDto update(HorseDetailDto horse) throws ValidationException, ConflictException {
     LOG.trace("update({})", horse);
     validator.validateForUpdate(horse);
     var updatedHorse = dao.update(horse);

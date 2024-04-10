@@ -37,7 +37,7 @@ public class TournamentValidator {
       validationErrors.add("Start date must be before end date");
     }
     if (tournament.startDate() != null && tournament.startDate().isBefore(LocalDate.of(1970, 1, 1))
-        || tournament.endDate() != null && tournament.endDate().isBefore(LocalDate.of(2030, 1, 1))) {
+        || tournament.endDate() != null && tournament.endDate().isAfter(LocalDate.of(2030, 1, 1))) {
       validationErrors.add("Invalid date given");
     }
     if (tournament.participants() == null || tournament.participants().size() != 8) {

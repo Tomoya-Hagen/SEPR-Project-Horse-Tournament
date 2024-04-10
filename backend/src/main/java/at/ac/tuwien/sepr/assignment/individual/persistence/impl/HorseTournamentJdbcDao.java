@@ -1,18 +1,19 @@
 package at.ac.tuwien.sepr.assignment.individual.persistence.impl;
 
 import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepr.assignment.individual.exception.FatalException;
 import at.ac.tuwien.sepr.assignment.individual.persistence.HorseTournamentDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +43,9 @@ public class HorseTournamentJdbcDao implements HorseTournamentDao {
 
   private static final String SQL_SET_ENTRY_NUMBER_AND_REACHED_ROUND = "UPDATE "
       + " tournament_horses " + " SET entry_number = ?, round_reached = ? WHERE horse_id = ? AND tournament_id = ?";
+
+  private static final String SQL_MAX_ID = " SELECT MAX(tournament_id) FROM " + TABLE_NAME;
+  private static final String SQL_MIN_ID = " SELECT MIN(tournament_id) FROM " + TABLE_NAME;
 
   private final JdbcTemplate jdbcTemplate;
 
@@ -89,8 +93,18 @@ public class HorseTournamentJdbcDao implements HorseTournamentDao {
   }
 
   @Override
-  public void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached) {
+  public void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached) throws ConflictException {
     LOG.trace("updateStandings({}, {}, {}, {})", tournamentId, horseId, entryNumber, roundReached);
+    Long minId = jdbcTemplate.queryForObject(SQL_MIN_ID, Long.class);
+    Long maxId = jdbcTemplate.queryForObject(SQL_MAX_ID, Long.class);
+    if (minId != null || maxId != null) {
+      if (tournamentId < minId || tournamentId > maxId) {
+        LOG.warn("Update of tournament failed. Tournament ID is outside the range of IDs stored in the database.");
+        List<String> errors = new ArrayList<>();
+        errors.add("Update of tournament failed. Tournament ID is outside the range of IDs stored in the database.");
+        throw new ConflictException("Tournaments ID is outside the range of IDs stored in the database", errors);
+      }
+    }
     int updatedRows = jdbcTemplate.update(
         SQL_SET_ENTRY_NUMBER_AND_REACHED_ROUND,
         entryNumber,

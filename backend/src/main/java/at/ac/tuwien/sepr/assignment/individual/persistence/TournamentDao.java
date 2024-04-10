@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.assignment.individual.persistence;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentCreateDto;
 import at.ac.tuwien.sepr.assignment.individual.dto.TournamentSearchParamsDto;
 import at.ac.tuwien.sepr.assignment.individual.entity.Tournament;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
 import at.ac.tuwien.sepr.assignment.individual.exception.NotFoundException;
 
 import java.time.LocalDate;
@@ -32,7 +33,7 @@ public interface TournamentDao {
    * @param tournament the tournament to create
    * @return the created tournament
    */
-  Tournament create(TournamentCreateDto tournament);
+  Tournament create(TournamentCreateDto tournament) throws ConflictException;
 
 
   /**

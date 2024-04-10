@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.assignment.individual.persistence;
 
 import at.ac.tuwien.sepr.assignment.individual.entity.HorseTournament;
+import at.ac.tuwien.sepr.assignment.individual.exception.ConflictException;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,7 +30,7 @@ public interface HorseTournamentDao {
    * @param entryNumber the entry number of the horse to update
    * @param roundReached the number of the round reached by the horse to update
    */
-  void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached);
+  void updateStandings(Long tournamentId, Long horseId, int entryNumber, int roundReached) throws ConflictException;
 
   /**
   * Get the horses of the tournaments with the given ids.
